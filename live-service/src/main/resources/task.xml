@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task.xsd
+	    http://code.alibabatech.com/schema/dubbo
+	    http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	    http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <task:annotation-driven/>
+
+
+    <bean id="scheduler" class="cn.idongjia.schedule.Scheduler" lazy-init="false">
+        <property name="tasks">
+            <list>
+                <ref bean="liveUVTask"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="liveUVTask" class="cn.idongjia.live.restructure.task.LiveUVTask">
+        <property name="interval" value="${live_uv_refresh_time}"/>
+        <property name="name" value="LIVE_UV_REFRESH"/>
+    </bean>
+    <bean name="taskProvider" class="cn.idongjia.task.provider.init.TaskProvider"
+          init-method="init" destroy-method="stop">
+        <property name="clusterName" value="${task.cluster.name}"/>
+        <property name="registAddr" value="${task.cluster.addr}"/>
+        <property name="taskProviderGroup" value="LiveTaskExecutorProvider"/>
+        <property name="zkClient" value="curator"/>
+    </bean>
+    <bean id="taskExcuter" class="cn.idongjia.task.excuter.init.TaskExcuter"
+          init-method="init" destroy-method="stop">
+        <property name="clusterName" value="${task.cluster.name}"/>
+        <property name="taskExcuterGroup" value="LiveTaskExecutor"/>
+        <property name="registAddr" value="${task.cluster.addr}"/>
+        <property name="zkClient" value="curator"/>
+    </bean>
+    <bean id="taskRunnerScanner" class="cn.idongjia.task.excuter.annocation.TaskRunnerScanner">
+        <property name="basePackage" value="cn.idongjia.live.restructure.manager"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,6 @@
+rootProject.name = 'live'
+include 'live-lib'
+include 'live-service'
+include 'live-core'
+include 'live-domain'
+

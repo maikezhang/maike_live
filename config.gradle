@@ -1,0 +1,92 @@
+def getGitVersion(prefix, withGit) {
+    return prefix + (withGit ? ('-' + ('git rev-parse --short HEAD'.execute().text.trim())) : '')
+}
+
+ext {
+
+    dependencies = [
+
+            'clan-lib'           : 'cn.idongjia:clan-lib:1.1.0-542cd3e',
+            'push-lib'           : 'cn.idongjia:push-lib:1.2.0-2aafb15',
+            'activity-lib'       : 'cn.idongjia:activity-lib:1.0.0-272d276',
+            'task-executor'      : 'cn.idongjia:task-excuter:1.0.0-8bcb495',
+            'task-provider'      : 'cn.idongjia:task-provider:1.0.0-8bcb495',
+            'task-common'        : 'cn.idongjia:task-common:1.0.0-a9dea66',
+            'task-lib'           : 'cn.idongjia:task-lib:1.0.0-0cbc307',
+            'gem-lib'            : 'cn.idongjia:gem-lib:1.2.0-f25ca66',
+            'auction-lib'        : 'cn.idongjia:auction-lib:1.1.0-59d8728',
+            'craft-lib'          : 'cn.idongjia:craft-lib:1.0.0-5b9ac24',
+            'zoo-lib'            : 'cn.idongjia:zoo-lib:1.0.0-4473f37',
+            'mq-lib'             : 'cn.idongjia:mq-lib:1.0.0-326a3c9',
+            'outcry-lib'         : 'cn.idongjia:outcry-lib:1.0.0-b33323c',
+            'common'             : 'cn.idongjia:common:1.3.2-178f458',
+            'search-lib'         : 'cn.idongjia:search-lib:1.0.0-ea25c9f',
+            'es-item-search-lib' : 'cn.idongjia:es-item-search-lib:1.0.0-98f7923',
+            'divine-lib'         : 'cn.idongjia:divine-lib:1.0.0-5c4e16b',
+            'se-lib'             : 'cn.idongjia:se-lib:2.0.0-8b82dd8',
+            'mongo-driver'       : 'org.mongodb:mongo-java-driver:3.1.0',
+            'jedis'              : 'redis.clients:jedis:2.7.3',
+            'gson'               : 'com.google.code.gson:gson:2.3.1',
+            'article-lib'        : 'cn.idongjia:article-lib:1.2.0-0ebd3f0',
+            'apm-brave'          : 'cn.idongjia:apm-brave:1.0.0-70a3ee4',
+            'dubbo-lib'          : 'cn.idongjia:dubbo-lib:1.1.1-450c58e',
+            'defend-lib'         : 'cn.idongjia:defend-lib:1.0.0-0cd2331',
+
+            'fastjson'           : 'com.alibaba:fastjson:1.2.7',
+
+            'hibernate-validator': 'org.hibernate:hibernate-validator:5.2.0.Final',
+            'validation-api'     : 'javax.validation:validation-api:1.1.0.Final',
+            'jaxrs-api'          : 'org.jboss.resteasy:jaxrs-api:3.0.7.Final',
+            'httpasyncclient'    : 'org.apache.httpcomponents:httpasyncclient:4.1.1',
+            'jackson-core'       : 'com.fasterxml.jackson.core:jackson-core:2.7.0-rc2',
+            'jackson-databind'   : 'com.fasterxml.jackson.core:jackson-databind:2.7.0-rc2',
+            'kafka-clients'      : 'org.apache.kafka:kafka-clients:0.9.0.0',
+            'rocketmq-client'    : 'com.alibaba.rocketmq:rocketmq-client:3.2.6',
+            'dozer'              : 'net.sf.dozer:dozer:5.5.1',
+
+            // spring
+            'spring-context'     : 'org.springframework:spring-context:4.2.4.RELEASE',
+            'spring-web'         : 'org.springframework:spring-web:4.2.4.RELEASE',
+            'spring-webmvc'      : 'org.springframework:spring-webmvc:4.2.4.RELEASE',
+            'spring-jdbc'        : 'org.springframework:spring-jdbc:4.2.4.RELEASE',
+            'spring-websocket'   : 'org.springframework:spring-websocket:4.2.4.RELEASE',
+            'spring-session'     : 'org.springframework.session:spring-session:1.0.2.RELEASE',
+            'spring-redis'       : 'org.springframework.session:spring-session-data-redis:1.0.2.RELEASE',
+            'spring-mongodb'     : 'org.springframework.data:spring-data-mongodb:1.8.0.RELEASE',
+
+            //msgpack
+            'msgpack'            : 'org.msgpack:msgpack:0.6.12',
+            // mysql
+            'mysql-connector'    : 'mysql:mysql-connector-java:5.1.36',
+            'druid'              : 'com.alibaba:druid:1.0.15',
+            'mybatis'            : 'org.mybatis:mybatis:3.3.0',
+            'mybatis-spring'     : 'org.mybatis:mybatis-spring:1.2.3',
+            'commons-beanutils'  : 'commons-beanutils:commons-beanutils:1.8.3',
+
+            //zookeeper
+            'zookeeper'          : 'org.apache.zookeeper:zookeeper:3.4.6',
+            'zkclient'           : 'com.github.sgroschupf:zkclient:0.1',
+            'protobuf'           : 'com.google.protobuf:protobuf-java:3.0.0-beta-1',
+            //百度云SDK
+            'bce-java-sdk'       : 'com.baidubce:bce-java-sdk:0.10.2',
+            'joda-time'          : 'joda-time:joda-time:2.9.3',
+            'lombok'             : 'org.projectlombok:lombok:1.16.16',
+            'guava'              : 'com.google.guava:guava:23.6-jre',
+
+            //单元测试
+            'junit'              : 'junit:junit:4.12',
+            'spring-test'        : 'org.springframework:spring-test:4.2.4.RELEASE',
+            'mockito-all'        : 'org.mockito:mockito-all:2.0.2-beta',
+            'htmlparser'         : 'org.htmlparser:htmlparser:2.1',
+            'jmockdata'          : 'com.github.jsonzou:jmockdata:2.4',
+            'powerMockJunit'     : 'org.powermock:powermock-module-junit4:1.7.3',
+            'powerMock'          : 'org.powermock:powermock-api-mockito:1.7.3',
+            'powerMockCore'      : 'org.powermock:powermock-core:1.7.3',
+            'disruptor'          : 'com.lmax:disruptor:3.4.2',
+            'hibernate-validator': 'org.hibernate.validator:hibernate-validator:6.0.2.Final',
+            'es-search'          : 'cn.idongjia:es-item-search-lib:1.0.0-0afc14c'
+
+
+    ]
+    lib_version = ['live-lib': getGitVersion('1.1.0', true)]
+}

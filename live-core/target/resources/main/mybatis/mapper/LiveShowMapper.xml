@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.LiveShowMapper">
+
+    <resultMap id="liveShowInfoMap" type="cn.idongjia.live.db.mybatis.po.LiveShowPO">
+        <id     column="id"                 property="id"                   />
+        <result column="title"              property="title"                />
+        <result column="type"               property="type"                 />
+        <result column="state"              property="state"                />
+        <result column="previewtm"          property="previewTime"          />
+        <result column="prestarttm"         property="estimatedStartTime"   />
+        <result column="preendtm"           property="estimatedEndTime"     />
+        <result column="starttm"            property="startTime"            />
+        <result column="endtm"              property="endTime"              />
+        <result column="createtm"           property="createTime"           />
+        <result column="modifiedtm"         property="modifiedTime"         />
+        <result column="uid"                property="userId"               />
+        <result column="room_id"            property="roomId"               />
+        <result column="zid"                property="zooId"                />
+        <result column="status"             property="status"               />
+        <result column="general_weight"     property="generalWeight"        />
+        <result column="online"             property="online"               />
+        <result column="show_desc"          property="showDesc"             />
+        <result column="screen_direction"   property="screenDirection"      />
+        <result column="need_auto_online"   property="autoOnline"           />
+        <result column="video_cover_id"     property="videoCoverId"         />
+    </resultMap>
+    <resultMap id="liveShowInfo4IndexMap" type="cn.idongjia.live.db.mybatis.po.LiveShow4IndexPO">
+        <id     column="id"                 property="id"               />
+        <result column="title"              property="title"            />
+        <result column="type"               property="type"             />
+        <result column="state"              property="state"            />
+        <result column="previewtm"          property="preViewTm"        />
+        <result column="prestarttm"         property="preStartTm"       />
+        <result column="preendtm"           property="preEndTm"         />
+        <result column="starttm"            property="startTm"          />
+        <result column="endtm"              property="endTm"            />
+        <result column="createtm"           property="createTm"         />
+        <result column="modifiedtm"         property="modifiedTm"       />
+        <result column="uid"                property="userId"           />
+        <result column="room_id"            property="roomId"           />
+        <result column="zooId"              property="zid"              />
+        <result column="status"             property="status"           />
+        <result column="asid"               property="asid"             />
+        <result column="video_cover_id"     property="videoCoverId"     />
+        <result column="general_weight"     property="generalWeight"    />
+        <result column="online"             property="online"           />
+        <result column="asid"               property="asid"             />
+        <result column="videoCoverUrl"      property="videoCoverUrl"    />
+        <result column="hasPlayback"        property="hasPlayback"      />
+        <result column="screen_direction"   property="screenDirection"  />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="liveShowPO">
+        INSERT INTO live_show
+          (title, uid, type, previewtm, prestarttm,
+           preendtm, starttm, endtm, zid, createtm,
+           modifiedtm, state, room_id, `status`, video_cover_id,
+           online,show_desc, screen_direction, need_auto_online)
+         VALUES
+            (#{title}, #{userId}, #{type}, #{previewTime}, #{estimatedStartTime},
+            #{estimatedEndTime}, #{startTime}, #{endTime}, #{zooId}, #{createTime}, #{modifiedTime},
+            #{state}, #{roomId}, #{status},#{videoCoverId},
+            #{online}, #{showDesc}, #{screenDirection}, #{autoOnline});
+    </insert>
+
+    <select id="list" resultMap="liveShowInfoMap">
+        SELECT
+          id, title, uid , type, previewtm, prestarttm,
+          preendtm, starttm, endtm,zid , createtm, modifiedtm,
+          room_id, state, status, show_desc, need_auto_online, screen_direction,
+         video_cover_id, general_weight, online
+        FROM live_show
+        <include refid="whereParam"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+    <sql id="whereParam">
+        <where>
+            <if test="ids != null and ids.size>0">
+                AND id in
+                <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+
+            <if test="types != null and types.size>0">
+                AND type in
+                <foreach collection="types" item="type" open="(" close=")" separator=",">
+                    #{type}
+                </foreach>
+            </if>
+            <if test="states != null and states.size>0">
+                AND state in
+                <foreach collection="states" item="state" open="(" close=")" separator=",">
+                    #{state}
+                </foreach>
+            </if>
+            <if test="userIds != null and userIds.size>0">
+                AND uid in
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="title != null"                >AND title like concat('%',#{title}, '%')      </if>
+            <if test="minPreviewTime != null"       >AND previewtm &gt;= #{minPreviewTime}        </if>
+            <if test="maxPreviewTime != null"       >AND previewtm &lt;= #{maxPreviewTime}        </if>
+            <if test="minEstimatedStartTime != null">AND prestarttm >= #{minEstimatedStartTime}</if>
+            <if test="maxEstimatedStartTime != null">AND prestarttm &lt;= #{maxEstimatedStartTime}</if>
+            <if test="minEstimatedEndTime != null"  >AND preendtm >= #{minEstimatedEndTime}    </if>
+            <if test="maxEstimatedEndTime != null"  >AND preendtm &lt;= #{maxEstimatedEndTime}    </if>
+            <if test="minStartTime != null"         >AND starttm >= #{minStartTime}            </if>
+            <if test="maxStartTime != null"         >AND starttm &lt;= #{maxStartTime}            </if>
+            <if test="minEndTime != null"           >AND endtm >= #{minEndTime}                </if>
+            <if test="maxEndTime != null"           >AND endtm &lt;= #{maxEndTime}                </if>
+            <if test="minCreateTime != null"        >AND createtm >= #{minCreateTime}          </if>
+            <if test="maxCreateTime != null"        >AND createtm &lt;= #{maxCreateTime}          </if>
+            <if test="roomId != null"               >AND room_id = #{roomId}                   </if>
+            <if test="zooId != null"                >AND zid = #{zooId}                        </if>
+            <if test="status != null and status.size>0"               >AND status in
+              <foreach collection="status" item="st" separator="," open="(" close=")">
+                  #{st}
+              </foreach>
+            </if>
+            <if test="generalWeight != null"        >AND general_weight = #{generalWeight}     </if>
+            <if test="online != null"               >AND online = #{online}                    </if>
+            <if test="screenDirection != null"      >AND screen_direction = #{screenDirection} </if>
+            <if test="autoOnline != null"           >AND need_auto_online = #{autoOnline}      </if>
+
+        </where>
+    </sql>
+    <select id="count" resultType="java.lang.Integer">
+        select count(1) from live_show
+        <include refid="whereParam"/>
+    </select>
+    <select id="get" resultMap="liveShowInfoMap">
+          SELECT
+            id, title, uid , type, previewtm, prestarttm , preendtm
+            , starttm, endtm,zid , createtm, modifiedtm, room_id , state,status
+            ,show_desc,general_weight,online,screen_direction,need_auto_online
+        FROM live_show where  id=#{id}
+    </select>
+    <select id="getLiveShowByUidValid" resultMap="liveShowInfoMap">
+        SELECT id, title,uid , type, previewtm, prestarttm , preendtm
+            , starttm, endtm,zid , createtm, modifiedtm, room_id , state
+            ,general_weight,online,show_desc,screen_direction,need_auto_online
+        FROM live_show ls
+        WHERE uid = #{0} AND (status = 0 or status = 1 or status = 2)
+              AND CASE
+                  WHEN state = 2 THEN 1
+                  WHEN state = 1 THEN preendtm >= #{1}
+                  WHEN state = 3 THEN 0 END
+        ORDER BY state DESC, CASE WHEN state = 2 THEN starttm
+                             WHEN state = 1 THEN prestarttm END LIMIT 1;
+    </select>
+
+    <select id="getByUidEndAfterNow" resultMap="liveShowInfoMap">
+        SELECT id, title,uid  , type, previewtm, prestarttm , preendtm
+        , starttm, endtm,zid , createtm, modifiedtm, room_id , state
+        ,general_weight,online,show_desc,screen_direction,need_auto_online
+        FROM live_show ls
+        WHERE uid = #{0}
+          AND (status = 0 or status = 1 or status = 2) AND type = 2
+          and state in (1,2)
+          AND preendtm >= #{1}
+        ORDER BY
+         state DESC, CASE WHEN state = 2 THEN starttm
+        WHEN state = 1 THEN prestarttm END LIMIT 1;
+    </select>
+
+    <update id="update">
+        UPDATE live_show ls
+        <set>
+            modifiedtm=from_unixtime(#{newUpdateTime}/1000)
+            <if test="po.title != null">, title = #{po.title}</if>
+            <if test="po.userId != null">, uid = #{po.userId}</if>
+            <if test="po.type != null">, type = #{po.type}</if>
+            <if test="po.state != null">, state = #{po.state}</if>
+            <if test="po.previewTime != null">, previewtm = #{po.previewTime}</if>
+            <if test="po.estimatedStartTime != null">, prestarttm = #{po.estimatedStartTime}</if>
+            <if test="po.estimatedEndTime != null">, preendtm = #{po.estimatedEndTime}</if>
+            <if test="po.startTime != null">, starttm = #{po.startTime}</if>
+            <if test="po.endTime != null">, endtm = #{po.endTime}</if>
+            <if test="po.zooId != null">, zid = #{po.zooId}</if>
+            <if test="po.createTime != null">, createtm = #{po.createTime}</if>
+            <if test="po.roomId != null">, room_id = #{po.roomId}</if>
+            <if test="po.status != null">, status = #{po.status}</if>
+            <if test="po.showDesc != null">, show_desc = #{po.showDesc}</if>
+            <if test="po.screenDirection != null">, screen_direction = #{po.screenDirection}</if>
+            <if test="po.online!=null">, online=#{po.online}</if>
+            <if test="po.generalWeight!=null">,general_weight=#{po.generalWeight}</if>
+            <if test="po.autoOnline != null">, need_auto_online = #{po.autoOnline}</if>
+        </set>
+        WHERE id = #{po.id}
+    </update>
+
+    <select id="countByTime" resultMap="liveShowInfoMap">
+        SELECT * FROM live_show ls
+        WHERE preendtm &gt;= #{0}
+              AND previewtm &lt;= #{1}
+              AND uid = #{2} AND (status = 0 OR status = 1 or status = 2)
+              AND state != 3
+    </select>
+
+    <select id="countByUpdateTime" resultMap="liveShowInfoMap">
+        SELECT id, title FROM live_show ls
+        WHERE id &lt;&gt; #{liveId} AND (status = 0 OR status = 1 or status = 2)
+        AND state != 3
+              AND uid = #{userId}
+              AND preendtm &gt;#{minEstimatedStartTime} AND previewtm &lt; #{maxEstimatedEndTime}
+    </select>
+
+    <update id="restRealTime">
+        UPDATE live_show SET starttm = NULL, endtm = NULL
+        WHERE id = #{0}
+    </update>
+
+
+    <select id="listForIndex" resultMap="liveShowInfo4IndexMap">
+        select
+        DISTINCT(ls.id) id,
+        (case when ls.type in (1,3,4,5,6) then  ls.title else kas.title end) title,
+        (case when ls.type in (1,3,4,5,6) then  lp.pic else kas.pic end) pic ,
+        ls.type,
+        ls.uid,
+        ls.previewtm,
+        ls.prestarttm,
+        ls.preendtm,
+        ls.starttm,
+        ls.endtm,
+        ls.zid,
+        ls.createtm,
+        ls.modifiedtm,
+        ls.room_id,
+        ls.state,
+        ls.status,
+        ls.online,
+        kas.asid,
+        lp.pic,
+        ls.`zid`,
+        lvc.url videoCoverUrl,
+        ls.general_weight generalWeight,
+        ls.screen_direction,
+        case  when lpb.`id` is NULL and ls.state=3 and ls.type in (1,3,4,5,6) then 0 else 1 end  hasPlayback
+        from live_show ls LEFT JOIN kp_auction_session kas on ls.id=kas.lsid
+--         and kas.status!=-1
+        left join live_pure lp on lp.id=ls.id and lp.status >= 0
+        left join live_video_cover lvc on ls.id = lvc.live_id
+        left join `live_playback` lpb on lpb.`lid`=lp.id  and  lpb.`duration`>300000
+        WHERE
+--         ls.status!=-1
+        1=1
+        AND (
+        CASE
+            WHEN ls.type = 2 THEN kas.asid IS NOT NULL
+            WHEN ls.type in ( 1 ,3,4,5,6) THEN lp.id IS NOT NULL
+        ELSE
+        1 = 1
+        END
+        )
+        <if test="ids != null">
+            and ls.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="updateTime !=null">
+            and ls.modifiedTm &gt; from_unixtime(#{updateTime}/1000)
+        </if>
+        <if test="states !=null and states.size>0">
+            and ls.state in
+            <foreach collection="states" item="state" open="(" close=")" separator=",">
+                #{state}
+            </foreach>
+        </if>
+        <choose>
+            <when test="limit !=null">
+                limit #{limit}
+            </when>
+            <otherwise>
+                limit 100
+            </otherwise>
+        </choose>
+        <if test="offset !=null">
+            offset #{offset}
+        </if>
+
+    </select>
+
+
+    <select id="countForIndex" resultType="java.lang.Long">
+        select
+        count(DISTINCT(ls.id))
+        from live_show ls LEFT JOIN kp_auction_session kas on ls.id=kas.lsid
+        and kas.status!=-1
+        left join live_pure lp on lp.id=ls.id and lp.status >= 0
+        left join live_video_cover lvc on ls.id = lvc.live_id
+        left join `live_playback` lpb on lpb.`lid`=lp.id
+        WHERE
+        ls.status!=-1
+        AND (
+        CASE
+            WHEN ls.type = 2 THEN kas.asid IS NOT NULL
+            WHEN ls.type in ( 1 ,3,4,5,6) THEN lp.id IS NOT NULL
+        ELSE
+        1 = 1
+        END
+        )
+        <if test="ids != null">
+            and ls.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="updateTime !=null">
+            and ls.modifiedTm &gt; #{updateTime}
+        </if>
+    </select>
+
+    <sql id="liveShowSql">
+        id, title, uid , `type`,status, previewtm, prestarttm , preendtm
+            , starttm, endtm,zid zooId, createtm, modifiedtm, room_id , state,
+            general_weight,online,show_desc,screen_direction
+    </sql>
+
+    <select id="countOverlapByPreViewTime" resultMap="liveShowInfoMap">
+            SELECT
+             <include refid="liveShowSql"/>
+             FROM live_show ls
+            WHERE ls.preendtm &gt;= from_unixtime(#{0}/1000)
+            AND ls.previewtm &lt;= from_unixtime(#{1}/1000)
+            AND ls.uid = #{2} AND (ls.status = 0 OR ls.status = 1 or ls.status = 2)
+            AND ls.state != 3
+    </select>
+
+    <select id="countOverlapByPreStartTime" resultMap="liveShowInfoMap">
+        SELECT
+        <include refid="liveShowSql"/>
+        FROM live_show ls
+        WHERE 1=1
+         <if test="liveId!=null"> and ls.id &lt;&gt; #{liveId}</if>
+        AND ls.preendtm &gt;= from_unixtime(#{preStartTime}/1000)
+        AND ls.prestarttm &lt;= from_unixtime(#{preEndTm}/1000)
+        AND ls.uid = #{uid} AND (ls.status = 0 OR ls.status = 1 or ls.status = 2)
+        AND ls.state != 3
+    </select>
+
+
+    <update id="updateForIndexUV">
+    		update live_show set modifiedTm=#{modifyTime} where
+    		            state = #{state} and status !=-1
+    </update>
+
+    <update id="resetStartTimeAndEndTime">
+         UPDATE live_show SET starttm = NULL, endtm = NULL
+        WHERE id = #{liveId}
+    </update>
+
+    <select id="getLiveSessionInfo" resultType="cn.idongjia.live.db.mybatis.po.LiveAuctionSessionPO">
+        select asid sessionId,lsid liveId,video_cover_id videoCoverId from kp_auction_session a LEFT JOIN live_show b ON a.lsid=b.id
+        where a.type=2 and  b.id IS NOT null limit #{limit} offset #{offset}
+    </select>
+
+</mapper>

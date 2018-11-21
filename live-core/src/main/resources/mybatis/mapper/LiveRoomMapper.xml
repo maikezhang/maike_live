@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.LiveRoomMapper">
+
+    <resultMap id="liveRoomInfoMap" type="cn.idongjia.live.db.mybatis.po.LiveRoomPO">
+        <id     column="id"         property="id"           />
+        <result column="uid"        property="userId"          />
+        <result column="cloud_type" property="cloudType"    />
+        <result column="cloud_id"   property="cloudId"      />
+        <result column="status"     property="status"       />
+        <result column="createtm"   property="createTime"   />
+        <result column="modifiedtm" property="modifiedTime" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO live_room
+          (uid, cloud_id, cloud_type, status, createtm, modifiedtm)
+        VALUES
+          (#{userId}, #{cloudId}, #{cloudType}, #{status}, #{createTime}, #{modifiedTime})
+    </insert>
+
+    <select id="get" resultMap="liveRoomInfoMap">
+        select id,uid, cloud_id, cloud_type, status, createtm, modifiedtm
+        from  live_room
+        where id=#{id}
+    </select>
+
+    <select id="list" resultMap="liveRoomInfoMap">
+        SELECT id,uid, cloud_id, cloud_type, status, createtm, modifiedtm FROM live_room
+        <include refid="whereParam"/>
+        <if test="orderBy != null"  >  ORDER BY ${orderBy} </if>
+        <if test="limit != null"    >  LIMIT #{limit}      </if>
+        <if test="offset != null"   >  OFFSET #{offset}    </if>
+    </select>
+    <sql id="whereParam">
+        <where>
+            <if test="ids != null  and  ids.size>0 ">
+                AND id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")" >
+                    #{id}
+                </foreach>
+            </if>
+            <if test="userIds != null and userIds.size>0">
+                AND uid in
+                <foreach collection="userIds" item="userId" separator="," open="(" close=")" >
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="status != null"   > AND status     = #{status}   </if>
+            <if test="cloudType != null"> AND cloud_type = #{cloudType}</if>
+        </where>
+    </sql>
+</mapper>

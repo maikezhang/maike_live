@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="true" scan="false" scanPeriod="30 seconds">
+    <contextName>live</contextName>
+    <conversionRule conversionWord="traceId" converterClass="cn.idongjia.log.converter.TraceIdConverter"/>
+    <conversionRule conversionWord="spanId" converterClass="cn.idongjia.log.converter.SpanIdConverter"/>
+    <conversionRule conversionWord="ipAddr" converterClass="cn.idongjia.log.converter.IpAddrConverter"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %cn %-5p %m [%t] %c.%M\(%L\)%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SERVICE-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.home}/logs/service.log</file>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %cn[%ipAddr] %-5p %traceId %spanId %m [%t] %c.%M\(%L\)
+                %n
+            </pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.home}/logs/service.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="INTERFACE-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.home}/logs/interface.log</file>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %cn[%ipAddr] %-5p %traceId %spanId %m%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.home}/logs/interface.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="SQL-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.home}/logs/ibatis.log</file>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %cn %-5p %m [%t] %c.%M\(%L\)%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.home}/logs/sql.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="TASKDISPACHER-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.home}/logs/taskdispacher.log</file>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %cn[%ipAddr] %-5p %traceId %spanId %m [%t] %c.%M\(%L\)%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.home}/logs/taskdispacher.%d{yyyy-MM-dd}.log.gz
+            </fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="MQDISPACHER-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.home}/logs/mqdispacher.log</file>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %cn %-5p %msgId %m%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.home}/logs/mqdispacher.%d{yyyy-MM-dd}.log.gz
+            </fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <logger level="info" name="cn.idongjia" additivity="false">
+        <appender-ref ref="SERVICE-OUT"/>
+    </logger>
+
+
+
+    <logger level="info" name="interface" additivity="false">
+        <appender-ref ref="INTERFACE-OUT"/>
+    </logger>
+
+    <logger level="info" name="taskdispacher" additivity="false">
+        <appender-ref ref="TASKDISPACHER-OUT"/>
+    </logger>
+
+    <logger level="info" name="mqdispacher" additivity="false">
+        <appender-ref ref="MQDISPACHER-OUT"/>
+    </logger>
+    <!-- druid配置 -->
+    <logger name="druid.sql.Statement" level="debug" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="SQL-OUT"/>
+
+    </logger>
+    <logger name="druid.sql.ResultSet" level="debug" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="SQL-OUT"/>
+
+    </logger>
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

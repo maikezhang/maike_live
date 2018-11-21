@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.PageTabMapper">
+    <resultMap id="pageTabMap" type="cn.idongjia.live.db.mybatis.po.PageTabPO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="weight" property="weight"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="desc" property="desc"/>
+        <result column="rel_id" property="relIds"/>
+        <result column="online" property="online"/>
+    </resultMap>
+
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO page_tab
+            (`name`,weight,`type`,status,`desc`,rel_id,online,create_time,update_time)
+        VALUES
+            (#{name},#{weight},#{type},#{status},#{desc},#{relIds},#{online},#{createTime},#{updateTime})
+    </insert>
+
+    <update id="update">
+        UPDATE page_tab
+        SET update_time=#{newUpdateTime}
+        <if test="po.name    != null">, name =#{po.name}</if>
+        <if test="po.weight   != null">, weight = #{po.weight}</if>
+        <if test="po.type    != null">, type = #{po.type}</if>
+        <if test="po.status    != null">, status = #{po.status}</if>
+        <if test="po.relIds    != null">, rel_id = #{po.relIds}</if>
+        <if test="po.desc      !=null">,`desc`=#{po.desc}</if>
+        <if test="po.online    != null">, online = #{po.online}</if>
+        WHERE id = #{po.id}
+    </update>
+    <select id="get" resultMap="pageTabMap">
+        SELECT id,`name`,weight,`type`,status,`desc`,create_time,update_time,online,rel_id
+        FROM page_tab
+        where id=#{id}
+    </select>
+
+    <select id="list" resultMap="pageTabMap">
+        SELECT id,`name`,weight,`type`,status,`desc`,create_time,update_time,online,rel_id
+        FROM page_tab
+        <include refid="whereParam"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+
+
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM page_tab
+        <include refid="whereParam"/>
+    </select>
+    <sql id="whereParam">
+        <where>
+            <if test="name    != null">and name LIKE concat('%',concat(#{content},'%'))</if>
+            <if test="type    !=null"> and type=#{type}</if>
+            <if test="status  != null">and status = #{status}</if>
+            <if test="online  != null">and  online = #{online}</if>
+            <if test="ids !=null and ids.size>0">
+                 and id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+
+        </where>
+    </sql>
+</mapper>

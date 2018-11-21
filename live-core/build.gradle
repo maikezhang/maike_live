@@ -1,0 +1,42 @@
+group 'cn.idongjia'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compile(project(':live-lib')) {
+        exclude module: "search-lib"
+        exclude module: "clan-lib"
+        exclude module: 'mq-lib'
+        exclude module: 'zoo-lib'
+
+    }
+    compile(rootProject.ext.dependencies['common']) {
+        exclude module: "javax.servlet"
+    }
+    compile(rootProject.ext.dependencies['zoo-lib']) {
+        exclude module: 'search-lib'
+        exclude module: 'common'
+        exclude module: 'gem-lib'
+        exclude module: 'live-lib'
+        exclude module: 'clan-lib'
+        exclude module: 'com.sun.jersey'
+        exclude module: 'mq-lib'
+    }
+    compile rootProject.ext.dependencies['lombok']
+    compile rootProject.ext.dependencies['disruptor']
+    compile rootProject.ext.dependencies['fastjson']
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+jar {
+    from('src/main/resources') {
+        include '**/*.xml'
+    }
+}

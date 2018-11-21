@@ -1,0 +1,139 @@
+group 'cn.idongjia'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':live-core')
+
+
+    compile(rootProject.ext.dependencies['clan-lib']) {
+        exclude module: 'common'
+        exclude module: 'zoo-lib'
+        exclude module: 'search-lib'
+        exclude module: 'gem-lib'
+        exclude module: 'com.sun.jersey'
+        exclude module: 'mq-lib'
+        exclude module: 'dubbo-lib'
+    }
+
+
+
+    compile(rootProject.ext.dependencies['gem-lib']) {
+        transitive = false
+
+    }
+
+    compile(rootProject.ext.dependencies['mq-lib']) {
+        exclude module: 'common'
+        exclude module: 'com.sun.jersey'
+    }
+    compile(rootProject.ext.dependencies['search-lib']) {
+        exclude module: 'common'
+        exclude group: 'cn.idongjia'
+        exclude module: 'com.sun.jersey'
+        exclude module: 'mq-lib'
+        exclude module: 'zookeeper'
+
+    }
+
+    compile(rootProject.ext.dependencies['se-lib']) {
+        transitive = false
+
+    }
+
+    compile(rootProject.ext.dependencies['apm-brave']) {
+        transitive = false
+    }
+
+    compile(rootProject.ext.dependencies['divine-lib']) {
+        exclude module: 'common'
+        exclude group: 'cn.idongjia'
+
+
+    }
+    compile(rootProject.ext.dependencies['article-lib']) {
+        exclude module: 'common'
+        exclude group: 'cn.idongjia'
+
+
+    }
+
+    compile rootProject.ext.dependencies['es-search']
+
+    compile(rootProject.ext.dependencies['outcry-lib']) {
+        exclude module: 'common'
+        exclude module: 'clan-lib'
+        exclude module: 'live-lib'
+        exclude module: 'zoo-lib'
+        exclude module: 'common'
+        exclude module: 'search-lib'
+        exclude module: 'gem-lib'
+        exclude module: 'com.sun.jersey'
+        exclude module: 'mq-lib'
+
+    }
+
+    compile(rootProject.ext.dependencies['activity-lib']) {
+        exclude module: 'search-lib'
+        exclude module: 'common'
+        exclude group: 'cn.idongjia'
+        exclude module: 'com.sun.jersey'
+        exclude module: 'mq-lib'
+    }
+    compile(rootProject.ext.dependencies['task-executor']) {
+        exclude module: 'common'
+        exclude module: 'mq-lib'
+        exclude module: 'task-common'
+
+    }
+    compile(rootProject.ext.dependencies['task-provider']) {
+        exclude module: 'common'
+        exclude module: 'mq-lib'
+        exclude module: 'task-common'
+
+    }
+    compile(rootProject.ext.dependencies['task-common']) {
+        exclude module: 'common'
+
+    }
+    compile(rootProject.ext.dependencies['task-lib']) {
+        exclude module: 'common'
+        exclude module: 'zoo-lib'
+        exclude module: 'auction-lib'
+        exclude module: 'sm-lib'
+        exclude module: 'com.sun.jersey'
+        exclude module: 'mq-lib'
+        exclude module: 'article-lib'
+
+    }
+
+    compile(rootProject.ext.dependencies['dubbo-lib']) {
+        exclude(module: 'common')
+    }
+    compile(rootProject.ext.dependencies['push-lib']) {
+        exclude module: "common"
+        exclude module: 'com.sun.jersey'
+        exclude module: 'mq-lib'
+    }
+    compile(rootProject.ext.dependencies['es-item-search-lib']) {
+        exclude module: "common"
+    }
+
+    compile(rootProject.ext.dependencies['defend-lib']) {
+        exclude module: "common"
+    }
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    from('src/main/resources') {
+        include '**/*.xml'
+    }
+}

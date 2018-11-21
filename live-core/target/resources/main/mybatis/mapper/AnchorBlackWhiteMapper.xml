@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.AnchorBlackWhiteMapper">
+
+    <resultMap id="anchorBlackWhiteMap" type="cn.idongjia.live.db.mybatis.po.AnchorBlackWhitePO">
+        <id     property="id"           column="id"         />
+        <result property="anchorId"     column="anchor_id"  />
+        <result property="type"         column="type"       />
+        <result property="createTime"   column="create"   />
+        <result property="updateTime"   column="update_time" />
+    </resultMap>
+
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO live_anchor_black_white(anchor_id,`type`,create_time,update_time)
+        VALUES (#{anchorId},#{type},#{createTime},#{updateTime})
+    </insert>
+
+    <insert id="batchInsert"  useGeneratedKeys="true" >
+        INSERT INTO live_anchor_black_white
+        (anchor_id,`type`,create_time,update_time)
+        VALUES
+        <foreach collection="pos" item="po" separator=",">
+            (#{po.anchorId},#{po.type},#{po.createTime},#{po.updateTime})
+        </foreach>
+    </insert>
+
+    <update id="update">
+        UPDATE live_anchor_black_white
+        <set>
+            update_time=#{newModifyTime}
+            <if test="po.anchorId != null"      >, anchor_id = #{po.anchorId} </if>
+            <if test="po.type != null" >, `type` = #{po.type} </if>
+            <if test="po.createTime != null" >, `create_time` = #{po.createTime} </if>
+        </set>
+        WHERE  id=#{po.id}
+    </update>
+
+    <select id="list" resultMap="anchorBlackWhiteMap">
+        SELECT id,anchor_id,`type`,create_time,update_time
+        FROM live_anchor_black_white
+        <include refid="whereParam"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+
+    </select>
+
+    <sql id="whereParam">
+        <where>
+            <if test="anchorIds !=null and anchorIds.size>0">
+                and anchor_id in
+                <foreach collection="anchorIds" item="anchorId" separator="," open="(" close=")">
+                    #{anchorId}
+                </foreach>
+            </if>
+            <if test="type!=null">and type=#{type}</if>
+        </where>
+    </sql>
+
+    <delete id="delete">
+        DELETE FROM live_anchor_black_white where id=#{id}
+    </delete>
+
+    <select id="get" resultMap="anchorBlackWhiteMap">
+        SELECT id,anchor_id,`type`,create_time,update_time
+        FROM live_anchor_black_white where anchor_id=#{anchorId}
+    </select>
+
+
+
+</mapper>

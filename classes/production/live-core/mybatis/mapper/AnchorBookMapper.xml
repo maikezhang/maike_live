@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.AnchorBookMapper">
+
+    <resultMap id="anchorsBookMap" type="cn.idongjia.live.db.mybatis.po.AnchorBookPO">
+        <id     property="id"           column="id"         />
+        <result property="userId"          column="uid"        />
+        <result property="anchorId"     column="anchor_id"  />
+        <result property="status"       column="status"     />
+        <result property="createTime"   column="createtm"   />
+        <result property="modifiedTime" column="modifiedtm" />
+    </resultMap>
+
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="anchorBookPO">
+        INSERT INTO live_anchor_book
+            (uid, anchor_id, status, createtm, modifiedtm)
+        VALUES
+            (#{userId}, #{anchorId}, #{status}, #{createTime}, #{modifiedTime})
+    </insert>
+
+    <update id="update">
+        UPDATE live_anchor_book
+        <set>
+            modifiedtm =from_unixtime(#{newModifyTime}/1000)
+            <if test="po.userId != null"      >, uid = #{po.userId}         </if>
+            <if test="po.anchorId != null" >, anchor_id = #{po.anchorId} </if>
+            <if test="po.status != null"   >, status = #{po.status}      </if>
+        </set>
+        WHERE uid = #{po.userId} AND anchor_id = #{po.anchorId}
+    </update>
+
+    <select id="list" resultMap="anchorsBookMap">
+        SELECT id, uid, anchor_id, status, createtm, modifiedtm
+        FROM live_anchor_book
+        <include refid="whereParam"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+    <sql id="whereParam">
+        <where>
+            <if test="id != null">AND id = #{id}</if>
+            <if test="userIds != null and userIds.size>0">
+                AND uid in
+                <foreach collection="userIds" item="userId" separator="," open="(" close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="anchorIds != null and anchorIds.size>0">
+                AND  anchor_id in
+                <foreach collection="anchorIds" item="anchorId" separator="," open="(" close=")">
+                    #{anchorId}
+                </foreach>
+            </if>
+            <if test="status != null and status.size>0">
+                AND  status in
+                <foreach collection="status" item="subStatus" separator="," open="(" close=")">
+                    #{subStatus}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+    <select id="count" resultType="java.lang.Integer">
+        SELECT count(id) FROM live_anchor_book
+        <include refid="whereParam"/>
+    </select>
+
+    <select id="getByUidAnchorId" resultMap="anchorsBookMap">
+         SELECT id, uid, anchor_id, status, createtm, modifiedtm
+        FROM live_anchor_book where uid=#{0} and anchor_id=#{1}
+    </select>
+
+</mapper>

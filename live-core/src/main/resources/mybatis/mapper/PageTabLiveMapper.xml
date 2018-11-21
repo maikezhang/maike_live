@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.PageTabLiveMapper">
+    <resultMap id="pageTabLiveMap" type="cn.idongjia.live.db.mybatis.po.PageTabLivePO">
+        <id column="id" property="id"/>
+        <result column="tab_id" property="tabId"/>
+        <result column="live_id" property="liveId"/>
+        <result column="weight" property="weight"/>
+        <result column="show_status" property="showStatus"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="batchInsert"  useGeneratedKeys="true" >
+        INSERT INTO page_tab_live
+            (tab_id,live_id,weight,show_status,create_time,update_time)
+        VALUES
+            <foreach collection="pageTabLivePOS" item="pageTabLivePO" separator=",">
+                (#{pageTabLivePO.tabId}, #{pageTabLivePO.liveId}, #{pageTabLivePO.weight}, #{pageTabLivePO.showStatus},#{pageTabLivePO.createTime},#{pageTabLivePO.updateTime})
+            </foreach>
+    </insert>
+
+    <update id="update">
+        UPDATE page_tab_live
+        SET update_time=#{newUpdateTime}
+        <if test="po.tabId    != null">, tab_id =#{po.tabId}</if>
+        <if test="po.liveId    != null">, live_id =#{po.liveId}</if>
+        <if test="po.weight   != null">, weight = #{po.weight}</if>
+        <if test="po.showStatus    != null">, show_status = #{po.showStatus}</if>
+        WHERE id = #{po.id}
+    </update>
+    <select id="get" resultMap="pageTabLiveMap">
+        SELECT id,tab_id,live_id,weight,show_status,create_time,update_time
+        FROM page_tab_live
+        where id=#{id}
+    </select>
+
+    <select id="list" resultMap="pageTabLiveMap">
+        SELECT id,tab_id,live_id,weight,show_status,create_time,update_time
+        FROM page_tab_live
+        <include refid="whereParam"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+
+
+    <delete id="delete"  >
+        delete  from  page_tab_live where id=#{id}
+    </delete>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM page_tab_live
+        <include refid="whereParam"/>
+    </select>
+    <sql id="whereParam">
+        <where>
+            <if test="tabId    !=null"> and tab_id=#{tabId}</if>
+            <if test="ids !=null and ids.size>0">
+                 and id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="showStatus !=null">and show_status=#{showStatus}</if>
+            <if test="liveIds !=null and liveIds.size>0">
+                 and live_id in
+                <foreach collection="liveIds" item="liveId" separator="," open="(" close=")">
+                    #{liveId}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
+
+
+    <select id="getPageTabLives" resultMap="pageTabLiveMap">
+        SELECT a.id,a.tab_id,a.live_id,a.weight,a.show_status,a.create_time,a.update_time
+        FROM page_tab_live a LEFT JOIN live_show b on a.live_id=b.id
+        where 1=1
+        <if test="liveTitle!=null"> and b.title like concat('%',#{liveTitle},'%')</if>
+        <if test="tabId!=null"> and a.tab_id =${tabId}</if>
+        <if test="liveIds !=null and liveIds.size>0">
+            and a.live_id in
+            <foreach collection="liveIds" item="liveId" separator="," open="(" close=")">
+                #{liveId}
+            </foreach>
+        </if>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+
+    </select>
+</mapper>

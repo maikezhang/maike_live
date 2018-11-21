@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.LivePureMapper">
+
+    <resultMap id="livePureMap" type="cn.idongjia.live.db.mybatis.po.LivePurePO">
+        <id     column="id"             property="id"            />
+        <result column="pic"            property="pic"           />
+        <result column="status"         property="status"        />
+        <result column="weight"         property="weight"        />
+        <result column="desc"           property="desc"          />
+        <result column="time_strategy"  property="timeStrategy"  />
+        <result column="exemption"      property="exemption"     />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="livePurePO">
+        INSERT INTO live_pure (id, pic, `desc`, weight, status, time_strategy, exemption)
+        VALUES (#{id}, #{pic}, #{desc}, #{weight}, #{status}, #{timeStrategy}, #{exemption})
+    </insert>
+
+    <select id="get" resultMap="livePureMap">
+        SELECT id, pic, `desc`, weight, status, time_strategy, exemption
+        FROM live_pure where  id=#{id}
+    </select>
+    <update id="update" parameterType="livePurePO">
+        UPDATE live_pure
+        SET id = #{id}
+            <if test="pic != null">, pic = #{pic}</if>
+            <if test="desc != null">, `desc` = #{desc}</if>
+            <if test="status != null">, status = #{status}</if>
+            <if test="weight != null">, weight = #{weight}</if>
+            <if test="timeStrategy != null">, time_strategy = #{timeStrategy}</if>
+            <if test="exemption != null">, exemption = #{exemption}</if>
+            WHERE id = #{id}
+    </update>
+
+    <select id="list" resultMap="livePureMap">
+        SELECT id, pic, `desc`, weight, status, time_strategy, exemption
+        FROM live_pure
+        <include refid="whereParam"/>
+        <if test="orderBy != null"> ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM live_pure
+        <include refid="whereParam"/>
+
+    </select>
+    <sql id="whereParam">
+        <where>
+            <if test="liveIds!=null and liveIds.size>0">
+                id in
+                <foreach collection="liveIds" item="liveId" separator="," open="("  close=")">
+                    #{liveId}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="countOpeningPureLives" resultType="int">
+        SELECT count(lp.id) FROM live_pure lp LEFT JOIN live_show ls ON ls.id = lp.id
+        WHERE ls.uid = #{0} AND lp.status = 1 AND (state = 1 OR state = 2) and ls.online=1
+    </select>
+
+    <select id="searchOverPureLives" resultType="long">
+        SELECT DISTINCT (lp.id) FROM live_pure lp LEFT JOIN live_show ls ON ls.id = lp.id
+        WHERE ls.uid = #{0} AND lp.status = 1 AND state = 3
+    </select>
+
+</mapper>

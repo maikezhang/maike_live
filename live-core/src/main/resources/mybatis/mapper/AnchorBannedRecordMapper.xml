@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.LiveAnchorBannedRecordMapper">
+    <resultMap id="fieldColumn" type="cn.idongjia.live.db.mybatis.po.AnchorBannedRecordPO">
+        <result property="id" column="id"/><!--  -->
+        <result property="userId" column="user_id"/><!-- 匠人uid -->
+        <result property="adminId" column="admin_id"/><!-- 操作管理员id -->
+        <result property="operation" column="operation"/><!-- 操作类型；2=禁播，1=解除禁播 -->
+        <result property="durationDay" column="duration_day"/><!-- 禁播持续天数；-1=永久 -->
+        <result property="message" column="message"/><!-- 操作原因 -->
+        <result property="updateTime" column="update_time"/><!-- 更新时间，13位时间戳 -->
+        <result property="createTime" column="create_time"/><!-- 创建时间，13位时间戳 -->
+    </resultMap>
+
+    <sql id="fieldAsProperty">
+        `id`,
+        `user_id`,
+        `admin_id`,
+        `operation`,
+        `duration_day`,
+        `message`,
+        `update_time`,
+        `create_time`
+    </sql>
+
+    <sql id="fieldWithoutId">
+        `user_id`,
+        `admin_id`,
+        `operation`,
+        `duration_day`,
+        `message`,
+        `update_time`,
+        `create_time`
+    </sql>
+
+    <sql id="property">
+        #{id,jdbcType=BIGINT},
+        #{userId,jdbcType=BIGINT},
+        #{adminId,jdbcType=BIGINT},
+        #{operation,jdbcType=INTEGER},
+        #{durationDay,jdbcType=INTEGER},
+        #{message,jdbcType=VARCHAR},
+        #{updateTime,jdbcType=BIGINT},
+        #{createTime,jdbcType=BIGINT}
+    </sql>
+
+    <sql id="propertyWithoutId">
+        #{userId,jdbcType=BIGINT},
+        #{adminId,jdbcType=BIGINT},
+        #{operation,jdbcType=INTEGER},
+        #{durationDay,jdbcType=INTEGER},
+        #{message,jdbcType=VARCHAR},
+        #{updateTime,jdbcType=BIGINT},
+        #{createTime,jdbcType=BIGINT}
+    </sql>
+
+    <sql id="fieldEqProperty">
+        `id`=#{id,jdbcType=BIGINT},
+        `user_id`=#{userId,jdbcType=BIGINT},
+        `admin_id`=#{adminId,jdbcType=BIGINT},
+        `operation`=#{operation,jdbcType=INTEGER},
+        `duration_day`=#{durationDay,jdbcType=INTEGER},
+        `message`=#{message,jdbcType=VARCHAR},
+        `update_time`=#{updateTime,jdbcType=BIGINT},
+        `create_time`=#{createTime,jdbcType=BIGINT}
+    </sql>
+
+    <sql id="fieldEqPropertyIf">
+        <if test="id!=null">
+            `id`=#{id,jdbcType=BIGINT},
+        </if>
+        <if test="userId!=null">
+            `user_id`=#{userId,jdbcType=BIGINT},
+        </if>
+        <if test="adminId!=null">
+            `admin_id`=#{adminId,jdbcType=BIGINT},
+        </if>
+        <if test="operation!=null">
+            `operation`=#{operation,jdbcType=INTEGER},
+        </if>
+        <if test="durationDay!=null">
+            `duration_day`=#{durationDay,jdbcType=INTEGER},
+        </if>
+        <if test="message!=null">
+            `message`=#{message,jdbcType=VARCHAR},
+        </if>
+        <if test="updateTime!=null">
+            `update_time`=#{updateTime,jdbcType=BIGINT},
+        </if>
+        <if test="createTime!=null">
+            `create_time`=#{createTime,jdbcType=BIGINT}
+        </if>
+    </sql>
+
+    <sql id="query">
+        <where>
+            <if test="userId!=null">
+                AND `user_id`=#{userId,jdbcType=BIGINT}
+            </if>
+            <if test="adminId!=null">
+                AND `admin_id`=#{adminId,jdbcType=BIGINT}
+            </if>
+            <if test="operation!=null">
+                AND `operation`=#{operation,jdbcType=INTEGER}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="idQuery">
+        <where>
+            <if test="id!=null">`id`=#{id}</if>
+            <if test="id==null">1=0</if>
+        </where>
+    </sql>
+
+    <insert id="insert"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `live_anchor_banned_record` (<include refid="fieldWithoutId"/>) VALUES (<include
+            refid="propertyWithoutId"/>)
+    </insert>
+
+
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM `live_anchor_banned_record`
+        <include refid="idQuery"/>
+    </delete>
+
+    <select id="getByPrimaryKey" resultMap="fieldColumn">
+        SELECT
+        <include refid="fieldAsProperty"/>
+        FROM `live_anchor_banned_record`
+        <include refid="idQuery"/>
+    </select>
+
+    <select id="select" resultMap="fieldColumn" parameterType="cn.idongjia.live.v2.pojo.query.LiveAnchorBanRecordQuery">
+        SELECT
+        <include refid="fieldAsProperty"/>
+        FROM `live_anchor_banned_record`
+        <include refid="query"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT ${limit}</if>
+        <if test="offset != null">OFFSET ${offset}</if>
+    </select>
+
+    <select id="count" resultType="java.lang.Integer"
+            parameterType="cn.idongjia.live.v2.pojo.query.LiveAnchorBanRecordQuery">
+        SELECT COUNT(1) FROM `live_anchor_banned_record`
+        <include refid="query"/>
+    </select>
+
+    <sql id="selectWithAnchor">
+        <where>
+            <if test="anchorState!=null">
+                AND anchor.anchor_state = #{anchorState}
+            </if>
+            <if test="userId!=null">
+                AND anchor.user_id = #{userId}
+            </if>
+            <if test="userIds!=null and userIds.size>0"> AND anchor.user_id in
+              <foreach collection="userIds" item="uid" open="(" separator="," close=")">
+                  #{uid}
+              </foreach>
+            </if>
+            <if test="adminId!=null">
+                AND record.admin_id = #{adminId}
+            </if>
+            <if test="operation!=null">
+                AND record.operation = #{operation}
+            </if>
+            <if test="operationTimeFrom!=null">
+                AND record.create_time &gt;= #{operationTimeFrom}
+            </if>
+            <if test="operationTimeEnd!=null">
+                AND record.create_time &lt;= #{operationTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectWithAnchor" resultMap="fieldColumn">
+        select record.*
+        from
+        live_anchor anchor
+        left join (
+        select * from live_anchor_banned_record group by user_id desc
+        ) record on anchor.user_id = record.user_id
+        <include refid="selectWithAnchor"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT ${limit}</if>
+        <if test="offset != null">OFFSET ${offset}</if>
+    </select>
+    
+    <select id="countWithAnchor" resultType="java.lang.Integer">
+        select count(1)
+        from
+        live_anchor anchor
+        left join (
+        select * from live_anchor_banned_record group by user_id desc
+        ) record on anchor.user_id = record.user_id
+        <include refid="selectWithAnchor"/>
+    </select>
+</mapper>

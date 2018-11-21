@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task.xsd
+	    http://code.alibabatech.com/schema/dubbo
+	    http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	    http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+	">
+
+    <task:annotation-driven/>
+
+    <context:annotation-config/>
+
+    <context:component-scan base-package="cn.idongjia.live" />
+
+    <import resource="mybatis.xml"/>
+    <import resource="redis.xml"/>
+
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <bean id="disconfMgrBean" class="com.baidu.disconf.client.DisconfMgrBean"
+          destroy-method="destroy">
+        <property name="scanPackage" value="cn.idongjia.live"/>
+    </bean>
+    <bean id="disconfMgrBean2" class="com.baidu.disconf.client.DisconfMgrBeanSecond"
+          init-method="init" destroy-method="destroy">
+    </bean>
+    <bean id="liveConfig"
+          class="com.baidu.disconf.client.addons.properties.ReloadablePropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:mysql-live.properties</value>
+                <value>classpath:redis-live.properties</value>
+                <value>classpath:zookeeper.properties</value>
+                <value>classpath:mq.properties</value>
+                <value>classpath:task.properties</value>
+                <value>classpath:live.properties</value>
+                <value>classpath:live-whitelist.properties</value>
+                <value>classpath:live-hotanchors.properties</value>
+                <value>classpath:apm.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="propertyConfigurer"
+          class="com.baidu.disconf.client.addons.properties.ReloadingPropertyPlaceholderConfigurer">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="propertiesArray">
+            <list>
+                <ref bean="liveConfig"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <array>
+                <value>classpath:disconf.properties</value>
+            </array>
+        </property>
+    </bean>
+
+    <dubbo:application name="live" owner="dongjia" organization="dongjia"/>
+    <!--内网测试机-->
+    <dubbo:registry protocol="zookeeper" address="${zookeeper}" client="curator"/>
+    <!--激活注解-->
+    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+
+    <dubbo:annotation/>
+
+    <dubbo:protocol name="rest" port="${server.port.rest}"
+                    contextpath="live"
+                    payload="16777216"/>
+
+    <dubbo:protocol name="dubbo" port="${server.port.dubbo}" payload="16777216"
+                    extension="cn.idongjia.exception.filter.DubboExceptionFilter"/>
+
+    <dubbo:provider
+            filter="-default,context,echo,clsLoader,gnc,dubbo,timeout,monitor,trace,finalcontext"/>
+    <dubbo:consumer filter="consumerfilter"/>
+
+    <dubbo:monitor protocol="registry"/>
+
+    <!--<dubbo:service interface="cn.idongjia.live.service.impl.login.LoginService"-->
+                   <!--ref="loginServiceImpl"-->
+                   <!--validation="true"-->
+                   <!--protocol="rest"/>-->
+    <!--新版接口 -->
+    <dubbo:service interface="cn.idongjia.live.service.impl.login.LoginService"
+                   ref="loginServiceImpl"
+                   validation="true"
+                   protocol="rest"/>
+    <!--新版接口 -->
+    <dubbo:service interface="cn.idongjia.live.api.live.LiveService"
+                   ref="liveServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.CraftsPureLiveService"
+                   ref="craftsPureLiveServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.HotAnchorsService"
+                   ref="hotAnchorsServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveAuditService"
+                   ref="pureLiveAuditServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveService"
+                   ref="pureLiveServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveTagService"
+                   ref="pureLiveTagServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveBookService"
+                   ref="pureLiveBookServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveBannerService"
+                   ref="pureLiveBannerService"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.WhiteListService"
+                   ref="whiteListServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.cloud.QCloudService"
+                   ref="qCloudServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.cloud.DCloudService"
+                   ref="dCloudServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PlayBackService"
+                   ref="playBackServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.common.api.PingService"
+                   ref="ping"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.live.VideoCoverService"
+                   ref="videoCoverService" protocol="dubbo, rest"/>
+    <dubbo:service interface="cn.idongjia.live.v2.service.CraftsLiveServiceV2"
+                   ref="craftsLiveServiceV2" protocol="dubbo,rest"/>
+
+    <dubbo:service interface="cn.idongjia.live.api.purelive.ResourceService"
+                   ref="resourceServiceImpl"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.live.ReportService"
+                   ref="reportServiceImpl"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.PageTabLiveServiceI"
+                   ref="pageTabLiveService"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.PageTabServiceI"
+                   ref="pageTabService"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.UserStageLiveServiceI"
+                   ref="userStageLiveService"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.v2.service.LiveAnchorService"
+                   ref="liveAnchorServiceImpl"  protocol="dubbo,rest"/>
+
+    <dubbo:service interface="cn.idongjia.live.api.homePage.LiveHomePageServiceI"
+                   ref="liveHomePageServiceI" protocol="dubbo,rest"/>
+
+    <dubbo:service interface="cn.idongjia.live.api.live.ModuleService" ref="moduleServiceImpl" protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.live.BannerService" ref="bannerServiceImpl" protocol="dubbo,rest"/>
+
+    <dubbo:reference interface="cn.idongjia.zoo.api.ZooCountService"
+                     id="zooCountService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.zoo.api.ZooMessageService"
+                     id="zooMessageService" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.zoo.api.ZooService"
+                     id="zooService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.clan.lib.service.UserService"
+                     id="userService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.clan.lib.service.UserCenterService"
+                     id="userCenterService" protocol="dubbo" check="false"
+                     timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.user.lib.service.CustomerService"
+                     id="customerService" protocol="dubbo" check="false"
+                     timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.clan.lib.service.CraftsmanService"
+                     id="craftsmanService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.push.api.NotifyService"
+                     id="notifyService" protocol="dubbo"
+                     check="false" async="true"/>
+    <dubbo:reference interface="cn.idongjia.activity.lib.service.ActivityService"
+                     id="activityService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.search.api.live.LiveSearchService"
+                     id="liveSearchService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+
+    <dubbo:reference interface="cn.idongjia.essearch.lib.service.live.LiveSearchService"
+                     id="esLiveSearchService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+
+    <dubbo:reference interface="cn.idongjia.outcry.service.SessionService"
+                     id="outcrySessionService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.gem.lib.service.ItemService"
+                     id="itemService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.search.api.follow.IndexFollowService"
+                     id="indexFollowService" protocol="dubbo"
+                     check="false" timeout="5000">
+        <dubbo:method name="insert" async="true" return="false"/>
+    </dubbo:reference>
+    <dubbo:reference interface="cn.idongjia.outcry.service.BookService" check="false"
+                     id="bookService" protocol="dubbo" timeout="5000"/>
+
+    <dubbo:reference interface="cn.idongjia.essearch.lib.service.live.LiveSearchService"
+                     id="liveHomeSearchService" protocol="dubbo" check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.outcry.service.SessionQueryService"
+                     id="sessionQueryService" protocol="dubbo" check="false" timeout="5000"/>
+
+    <dubbo:reference interface="cn.idongjia.divine.lib.service.LiveService" timeout="3000"
+                     id="divineLiveService" check="false" protocol="dubbo"/>
+
+    <dubbo:reference interface="cn.idongjia.divine.lib.service.AuctionService" timeout="3000"
+                     id="divineAuctionService" check="false" protocol="dubbo"/>
+    <dubbo:reference interface="cn.idongjia.divine.lib.service.LiveSpecialCraftsmanService" timeout="3000"
+                     id="divineLiveSpecialCraftsmanService" check="false" protocol="dubbo"/>
+
+    <dubbo:reference interface="cn.idongjia.push.service.WxPushService"
+                     id="wxPushService" protocol="dubbo" check="false" timeout="5000"/>
+
+
+    <bean id="configManager" class="cn.idongjia.live.restructure.manager.ConfigManager">
+        <property name="liveDuration" value="${live_duration}"/>
+        <property name="recordFormat" value="${record_format}"/>
+        <property name="proxyPrefix" value="${proxy_prefix}"/>
+        <property name="cloudType" value="${cloud_type}"/>
+        <property name="QCloudRecordDuration" value="${qcloud_record_duration}"/>
+        <property name="QCloudBizidKey" value="${qcloud_bizid_key}"/>
+        <property name="QCloudRecordKey" value="${qcloud_record_key}"/>
+        <property name="QCloudAPIKey" value="${qcloud_play_key}"/>
+        <property name="QCloudFcgiUrl" value="${qcloud_fcgi_url}"/>
+        <property name="QCloudStatcgiUrl" value="${qcloud_statcgi_url}"/>
+        <property name="VCloudAppKey" value="${vcloud_app_key}"/>
+        <property name="VCloudAppSecret" value="${vcloud_app_secret}"/>
+        <property name="VCloudCreateUrl" value="${vcloud_create_url}"/>
+        <property name="VCloudPauseUrl" value="${vcloud_pause_url}"/>
+        <property name="VCloudResumeUrl" value="${vcloud_resume_url}"/>
+        <property name="VCloudAddressUrl" value="${vcloud_address_url}"/>
+        <property name="VCloudRecordUrl" value="${vcloud_record_url}"/>
+        <property name="VCloudVideoListUrl" value="${vcloud_videolist_url}"/>
+        <property name="VCloudVideoDetailUrl" value="${vcloud_videodetail_url}"/>
+        <property name="VCloudRecordDuration" value="${vcloud_record_duration}"/>
+        <property name="QCloudAppId" value="${qcloud_appid}"/>
+        <property name="h5Prefix" value="${h5_prefix}"/>
+        <property name="h5Suffix" value="${h5_suffix}"/>
+        <property name="shareDescTemplate" value="${share_desc_template}"/>
+        <property name="pushContent" value="${push_content}"/>
+        <property name="liveSuid" value="${live_suid}"/>
+        <property name="zooRandomCount" value="${zoo_random_count}"/>
+        <property name="auditMsgPassed" value="${audit_msg_passed}"/>
+        <property name="disconfAddr" value="${disconf.conf_server_host}"/>
+        <property name="disconfApp" value="${disconf.app}"/>
+        <property name="disconfEnv" value="${disconf.env}"/>
+        <property name="disconfVersion" value="${disconf.version}"/>
+        <property name="disconfUser" value="${disconf_user}"/>
+        <property name="disconfPassWord" value="${disconf_password}"/>
+        <property name="whiteListUids" value="${whitelist_uids}"/>
+        <property name="hotAnchors" value="${hot_anchors}"/>
+        <property name="whiteListConfName" value="${whitelist_config_name}"/>
+        <property name="hotAnchorsConfName" value="${hot_config_name}"/>
+        <property name="recommendNum" value="${recommend_num}"/>
+        <property name="foreShowNum" value="${foreshow_num}"/>
+        <property name="columnPos" value="${column_pos}"/>
+        <property name="hotLiveTitle" value="${hot_live_title}"/>
+        <property name="hotColumnTitle" value="${hot_column_title}"/>
+        <property name="hotAnchorTitle" value="${hot_anchor_title}"/>
+        <property name="hotAnchorsPos" value="${hot_anchors_pos}"/>
+        <property name="foreShowDays" value="${foreshow_days}"/>
+        <property name="maxForeShowDays" value="${max_foreshow_days}"/>
+        <property name="userLiveRemind" value="${user_live_remind}"/>
+        <property name="userPlayBackRemind" value="${user_playback_remind}"/>
+        <property name="userNothingRemind" value="${user_nothing_remind}"/>
+        <property name="infoContent" value="${info_content}"/>
+        <property name="liveStartTips" value="${live_start_tips}"/>
+        <property name="leastDuration" value="${least_duration}"/>
+        <property name="titleSuffix" value="${title_suffix}"/>
+        <property name="maxForeShowLimit" value="${max_foreshow_limit}"/>
+        <property name="redisExpireTime" value="${redis_expire_time}"/>
+        <property name="charsToRemove" value="${chars_to_remove}"/>
+        <property name="cacheExpireTime" value="${cache_expire_time}"/>
+        <property name="liveListUrl" value="${live_list_url}"/>
+        <property name="liveListShareDesc" value="${live_list_share_desc}"/>
+        <property name="liveListShareTitle" value="${live_list_share_title}"/>
+        <property name="liveListSharePic" value="${live_list_share_pic}"/>
+        <property name="isDebugMinutes" value="${isDebugMinutes}"/>
+        <property name="servicePhoneNumber" value="${servicePhoneNumber}"/>
+        <property name="maxTitleNum" value="${max_title_num}" />
+        <property name="maxShowDescNum" value="${max_show_desc_num}" />
+        <property name="liveStartInterval" value="${live_start_interval}" />
+        <property name="liveEndInterval" value="${live_end_interval}" />
+        <property name="liveAutoOnlineInterval" value="${live_auto_online_interval}" />
+        <property name="liveResourceMaxNum" value="${live_max_resource}" />
+        <property name="maxPreStartTime" value="${max_pre_start_time}" />
+        <property name="defaultH5Url" value="${default_h5_url}" />
+        <property name="defaultTemplateId" value="${default_template_id}" />
+        <property name="saveTemplateUrl" value="${save_template_url}"/>
+        <property name="getTemplateDataUrl" value="${get_template_data_url}"/>
+        <property name="liveMixTabContent" value="${live_mix_tab_content}"/>
+        <property name="appInvokeTemplateUrl" value="${app_invoke_template_url}"/>
+        <property name="getAppTemplateUrl" value="${get_app_template_url}"/>
+        <property name="playAddr" value="${play_addr}"/>
+        <property name="reportAddr" value="${report_addr}"/>
+        <property name="liveTypeConfig" value="${live_type_config}"/>
+        <property name="liveHomePageTabSize" value="${live_homepage_tab_size}"/>
+    </bean>
+
+    <bean class="cn.idongjia.live.support.SpringBeanLoader" lazy-init="false"/>
+
+    <!-- redis db 5-->
+    <!--<bean id="jedisPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig"/>-->
+    <!--<bean id="jedisPool" class="redis.clients.jedis.JedisPool">-->
+        <!--<constructor-arg index="0" type="org.apache.commons.pool2.impl.GenericObjectPoolConfig"-->
+                         <!--ref="jedisPoolConfig"/>-->
+        <!--<constructor-arg index="1" value="${redis.host}"/>-->
+        <!--<constructor-arg index="2" type="int" value="${redis.port}"/>-->
+        <!--<constructor-arg index="3" type="int" value="2000"/>-->
+        <!--<constructor-arg index="4" value="${redis.password}"/>-->
+        <!--<constructor-arg index="5" type="int" value="${redis.database}"/>-->
+    <!--</bean>-->
+
+    <bean id="mqListenerScanner" class="cn.idongjia.mq.annocation.MqListenerScanner">
+        <property name="basePackage" value="cn.idongjia.live.restructure.manager"/>
+    </bean>
+
+    <!--- mq config -->
+    <bean id="producer" class="cn.idongjia.mq.producer.Producer"
+          init-method="init" destroy-method="destory">
+        <property name="producerName" value="${mq.live_cluster.producer.name}"/>
+        <property name="clusterAddr" value="${mq.cluster.addr}"/>
+    </bean>
+
+    <bean id="consumer" class="cn.idongjia.mq.consumer.Consumer"
+          destroy-method="destroy">
+        <property name="consumeMode" value="${mq.live_cluster.consumer.mode}"/>
+        <property name="consumerGroup" value="${mq.live_cluster.consumer.group}"/>
+        <property name="consumerName" value="${mq.live_cluster.consumer.name}"/>
+        <property name="clusterAddr" value="${mq.cluster.addr}"/>
+    </bean>
+
+    <bean id="ping" class="cn.idongjia.common.impl.Ping"/>
+
+    <bean id="scheduler" class="cn.idongjia.schedule.Scheduler" lazy-init="false">
+        <property name="tasks">
+            <list>
+                <ref bean="liveUVTask"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="liveUVTask" class="cn.idongjia.live.restructure.task.LiveUVTask">
+        <property name="interval" value="${live_uv_refresh_time}"/>
+        <property name="name" value="LIVE_UV_REFRESH"/>
+    </bean>
+    <bean name="taskProvider" class="cn.idongjia.task.provider.init.TaskProvider"
+          init-method="init" destroy-method="stop">
+        <property name="clusterName" value="${task.cluster.name}"/>
+        <property name="registAddr" value="${task.cluster.addr}"/>
+        <property name="taskProviderGroup" value="LiveTaskExecutorProvider"/>
+        <property name="zkClient" value="curator"/>
+    </bean>
+    <bean id="taskExcuter" class="cn.idongjia.task.excuter.init.TaskExcuter"
+          init-method="init" destroy-method="stop">
+        <property name="clusterName" value="${task.cluster.name}"/>
+        <property name="taskExcuterGroup" value="LiveTaskExecutor"/>
+        <property name="registAddr" value="${task.cluster.addr}"/>
+        <property name="zkClient" value="curator"/>
+    </bean>
+    <bean id="taskRunnerScanner" class="cn.idongjia.task.excuter.annocation.TaskRunnerScanner">
+        <property name="basePackage" value="cn.idongjia.live.restructure.manager"/>
+    </bean>
+    <!--- AOP -->
+    <!--- <aop:config>
+        <aop:pointcut id="liveAdminService" expression="execution(* cn.idongjia.live.service.impl.live.LiveServiceImpl))"/>
+        <aop:aspect id="liveAdminServiceAop" ref="liveAdminServiceAop">
+            <aop:before method="logAop" pointcut-ref="liveAdminService" />
+            <aop:after method="after" pointcut-ref="liveAdminService" />
+        </aop:aspect>
+    </aop:config> -->
+
+
+    <!--<context:component-scan base-package="cn.idongjia.apm"/>-->
+    <!--<bean id="braveConfig" class="cn.idongjia.apm.brave.config.BraveConfig">-->
+    <!--<property name="endPoint" value="${endPoint}"/>-->
+    <!--<property name="appName" value="live"/>-->
+    <!--<property name="sampler" value="1.0f"/>-->
+    <!--</bean>-->
+
+    <!--<mvc:interceptors>-->
+    <!--<bean class="cn.idongjia.apm.brave.mvc.TracingAsyncHandlerInterceptor"/>-->
+    <!--</mvc:interceptors>-->
+
+</beans>

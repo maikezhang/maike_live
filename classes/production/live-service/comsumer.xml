@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task.xsd
+	    http://code.alibabatech.com/schema/dubbo
+	    http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	    http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+
+    <dubbo:reference interface="cn.idongjia.zoo.api.ZooCountService"
+                     id="zooCountService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.zoo.api.ZooMessageService"
+                     id="zooMessageService" timeout="5000" check="false"/>
+    <dubbo:reference interface="cn.idongjia.zoo.api.ZooService"
+                     id="zooService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.clan.lib.service.UserService"
+                     id="userService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.clan.lib.service.UserCenterService"
+                     id="userCenterService" protocol="dubbo" check="false"
+                     timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.clan.lib.service.CustomerService"
+                     id="customerService" protocol="dubbo" check="false"
+                     timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.clan.lib.service.CraftsmanService"
+                     id="craftsmanService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.push.api.NotifyService"
+                     id="notifyService" protocol="dubbo"
+                     check="false" async="true"/>
+    <dubbo:reference interface="cn.idongjia.activity.lib.service.ActivityService"
+                     id="activityService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.search.api.live.LiveSearchService"
+                     id="liveSearchService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+
+    <dubbo:reference interface="cn.idongjia.essearch.lib.service.live.LiveSearchService"
+                     id="esLiveSearchService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+
+    <dubbo:reference interface="cn.idongjia.outcry.service.SessionService"
+                     id="outcrySessionService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.gem.lib.service.ItemService"
+                     id="itemService" protocol="dubbo"
+                     check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.search.api.follow.IndexFollowService"
+                     id="indexFollowService" protocol="dubbo"
+                     check="false" timeout="5000">
+        <dubbo:method name="insert" async="true" return="false"/>
+    </dubbo:reference>
+    <dubbo:reference interface="cn.idongjia.outcry.service.BookService" check="false"
+                     id="bookService" protocol="dubbo" timeout="1000"/>
+
+    <dubbo:reference interface="cn.idongjia.essearch.lib.service.live.LiveSearchService"
+                     id="liveHomeSearchService" protocol="dubbo" check="false" timeout="5000"/>
+    <dubbo:reference interface="cn.idongjia.outcry.service.SessionQueryService"
+                     id="sessionQueryService" protocol="dubbo" check="false" timeout="1000"/>
+
+    <dubbo:reference interface="cn.idongjia.divine.lib.service.LiveService" timeout="3000"
+                     id="divineLiveService" check="false" protocol="dubbo"/>
+
+    <dubbo:reference interface="cn.idongjia.divine.lib.service.AuctionService" timeout="3000"
+                     id="divineAuctionService" check="false" protocol="dubbo"/>
+
+    <dubbo:reference interface="cn.idongjia.divine.lib.service.LiveSpecialCraftsmanService" timeout="3000"
+                     id="divineLiveSpecialCraftsmanService" check="false" protocol="dubbo"/>
+
+    <dubbo:reference interface="cn.idongjia.push.service.WxPushService"
+                     id="wxPushService" protocol="dubbo" check="false" timeout="5000"/>
+
+    <dubbo:reference interface="cn.idongjia.clan.lib.service.OAuthService" protocol="dubbo"
+                 id="oAuthService" timeout="2000" retries="0" check="false"/>
+
+    <dubbo:reference interface="cn.idongjia.article.lib.service.HomepageLiveService"
+                     protocol="dubbo" check="false" retries="1" timeout="3000" id="articleHomepageLiveService"/>
+
+</beans>

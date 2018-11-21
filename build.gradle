@@ -1,0 +1,21 @@
+apply from: "config.gradle"
+apply plugin: 'eclipse'
+allprojects {
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    group 'cn.idongjia'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    buildDir = 'target'
+    configurations {
+        compile.exclude module: 'log4j'
+        compile.exclude module: 'slf4j-log4j12'
+    }
+    configurations.all {
+        resolutionStrategy {
+            force 'org.apache.zookeeper:zookeeper:3.4.6'
+        }
+    }
+}
+

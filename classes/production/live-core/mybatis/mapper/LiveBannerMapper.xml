@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.LiveBannerMapper">
+    <resultMap id="bannerMap" type="cn.idongjia.live.db.mybatis.po.LiveBannerPO">
+        <id     property="id"          column="id"        />
+        <result property="pic"          column="pic"        />
+        <result property="jumpType"         column="jump_type"       />
+        <result property="jumpAddr"         column="jump_addr"       />
+        <result property="weight"       column="weight"     />
+        <result property="status"       column="status"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateTime" column="update_time" />
+        <result property="classificationId"   column="classification_id"     />
+        <result property="newVersionPic" column="new_version_pic"/>
+    </resultMap>
+    <insert id="insert" parameterType="LiveBannerPO" useGeneratedKeys="true" keyProperty="id">
+        insert into live_banner
+            (pic,jump_type,jump_addr,weight,status,create_time,update_time,classification_id,new_version_pic)
+        values
+            (#{pic},#{jumpType},#{jumpAddr},#{weight},#{status},#{createTime},#{updateTime},#{classificationId},#{newVersionPic})
+    </insert>
+    <update id="update" >
+        update live_banner
+        set update_time=#{updateTime}
+        <if test="pic !=null">,pic=#{pic}</if>
+        <if test="jumpType !=null">,jump_type=#{jumpType}</if>
+        <if test="jumpAddr !=null">,jump_addr=#{jumpAddr}</if>
+        <if test="weight !=null">,weight=#{weight}</if>
+        <if test="status !=null">,status=#{status}</if>
+        <if test="newVersionPic!=null">,new_version_pic=#{newVersionPic}</if>
+        <if test="classificationId !=null">,classification_id=#{classificationId}</if>
+        where id=#{id}
+    </update>
+
+
+    <select id="list" resultMap="bannerMap">
+        select * from live_banner
+        <include refid="whereParam"/>
+        <if test="orderBy !=null"   >order by ${orderBy} </if>
+
+        <if test="limit != null"    >LIMIT ${limit}      </if>
+        <if test="offset != null"   >OFFSET ${offset}    </if>
+    </select>
+    <sql id="whereParam">
+        <where>
+            <if test="id !=null"               > and id=#{id}              </if>
+            <if test="classificationId !=null">and classification_id=#{classificationId}</if>
+            <choose>
+                <when test="status !=null">
+                    and status=#{status}
+                </when>
+                <otherwise>
+                    and status !=-1
+                </otherwise>
+            </choose>
+        </where>
+    </sql>
+    <select id="count" resultType="int">
+        select count(*) from live_banner
+        <include refid="whereParam"/>
+    </select>
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.UserStageLiveMapper">
+
+    <resultMap id="userStageLiveMap" type="cn.idongjia.live.db.mybatis.po.UserStageLivePO">
+        <id column="id" property="id"/>
+        <result column="stage" property="stage"/>
+        <result column="status" property="status"/>
+        <result column="show_status" property="showStatus"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="live_id" property="liveId"/>
+        <result column="weight" property="weight"/>
+    </resultMap>
+
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="userStageLivePO">
+        INSERT INTO live_user_stage_rel
+            (stage,status,live_id,show_status,create_time,update_time,weight)
+        VALUES
+            ( #{stage}, #{status},#{liveId},#{showStatus}, #{createTime}, #{updateTime},#{weight})
+    </insert>
+    <insert id="batchInsert" useGeneratedKeys="true" >
+        INSERT INTO live_user_stage_rel
+        (stage,status,live_id,show_status,create_time,update_time,weight)
+        VALUES
+        <foreach collection="userStageLivePOS" item="po" separator=",">
+            ( #{po.stage}, #{po.status},#{po.liveId},#{po.showStatus}, #{po.createTime}, #{po.updateTime},#{po.weight})
+        </foreach>
+    </insert>
+
+    <update id="update">
+        UPDATE live_user_stage_rel
+        SET update_time=#{newUpdateTime}
+        <if test="po.showStatus    != null">, show_status = #{po.showStatus}</if>
+        <if test="po.stage    != null">, stage = #{po.stage}</if>
+        <if test="po.status    != null">, status = #{po.status}</if>
+        <if test="po.liveId    != null">, live_id = #{po.liveId}</if>
+        <if test="po.weight !=null">,weight=#{po.weight}</if>
+        WHERE id = #{po.id}
+    </update>
+
+
+    <select id="list" resultMap="userStageLiveMap">
+        SELECT id,stage,status,live_id,show_status,create_time,update_time,weight
+        FROM live_user_stage_rel
+        <include refid="whereParam"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+    <select id="get" resultMap="userStageLiveMap">
+        SELECT id,stage,status,live_id,show_status,create_time,update_time,weight
+        FROM live_user_stage_rel
+       where id=#{id}
+    </select>
+    <select id="count" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM live_user_stage_rel
+        <include refid="whereParam"/>
+    </select>
+    <sql id="whereParam">
+        <where>
+            <if test="stages !=null and stages.size>0">
+                stage in
+                <foreach collection="stages" item="stage" separator="," open="(" close=")">
+                    #{stage}
+                </foreach>
+            </if>
+            <if test="showStatus !=null"> and  show_status =#{showStatus}</if>
+            <if test="status !=null"> and  status =#{status}</if>
+            <if test="liveIds !=null and liveIds.size>0">
+                 and live_id in
+                <foreach collection="liveIds" item="liveId" separator="," open="(" close=")">
+                    #{liveId}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+</mapper>

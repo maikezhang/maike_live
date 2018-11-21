@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.mapper.TimeStrategyMapper">
+
+    <resultMap id="strategyMap" type="cn.idongjia.live.pojo.purelive.TimeStrategyDO">
+        <id property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="periodStartTm" column="period_starttm"/>
+        <result property="periodEndTm" column="period_endtm" />
+        <result property="createTm" column="createtm" />
+        <result property="modifiedTm" column="modifiedtm" />
+    </resultMap>
+
+    <insert id="insertStrategy" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO live_time_strategy (type, period_starttm, period_endtm, createtm, modifiedtm, status)
+        VALUES (#{type}, #{periodStartTm}, #{periodEndTm}, #{createTm}, #{modifiedTm}, #{status})
+    </insert>
+
+    <update id="updateStrategy">
+        UPDATE live_time_strategy SET id = #{id}, period_starttm = #{periodStartTm}
+        , period_endtm = #{periodEndTm}
+        <if test="type != null"> ,type = #{type}</if>
+        <if test="createTm != null"> ,createtm = #{createtm}</if>
+        <if test="modifiedTm != null"> ,modifiedtm = #{modifiedTm}</if>
+        WHERE id = #{id}
+    </update>
+
+    <select id="getStrategy" resultMap="strategyMap">
+        SELECT id, type, period_starttm, period_endtm, createtm, modifiedtm, status
+        FROM live_time_strategy WHERE id = #{0}
+    </select>
+
+</mapper>

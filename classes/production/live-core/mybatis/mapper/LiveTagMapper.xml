@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.LiveTagMapper">
+
+    <resultMap id="tagMap" type="cn.idongjia.live.db.mybatis.po.LiveTagPO">
+        <id     property="id"           column="id"         />
+        <result property="name"         column="name"       />
+        <result property="type"         column="type"       />
+        <result property="pic"          column="pic"        />
+        <result property="desc"         column="desc"       />
+        <result property="weight"       column="weight"     />
+        <result property="modifiedTime" column="modifiedTm" />
+        <result property="createTime"   column="createTm"   />
+        <result property="status"       column="status"     />
+    </resultMap>
+
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true"
+            parameterType="cn.idongjia.live.pojo.purelive.tag.PureLiveTagDO">
+        INSERT INTO live_pure_tag
+            (name, type, pic, `desc`, status, weight, modifiedtm, createtm)
+         VALUES
+            (#{name}, #{type}, #{pic}, #{desc}, #{status}, #{weight}, #{modifiedTime}, #{createTime})
+    </insert>
+
+    <update id="update">
+        UPDATE live_pure_tag SET modifiedtm = from_unixtime(#{newUpdateTime}/1000)
+        <if test="po.name != null">, name = #{po.name}</if>
+        <if test="po.type != null">, type = #{po.type}</if>
+        <if test="po.pic != null">, pic = #{po.pic}</if>
+        <if test="po.desc != null">, `desc` = #{po.desc}</if>
+        <if test="po.status != null">, status = #{po.status}</if>
+        <if test="po.weight != null">, weight = #{po.weight}</if>
+        WHERE id = #{po.id}
+    </update>
+
+    <select id="list" resultMap="tagMap">
+        SELECT id, name, type, pic, `desc`, status, createtm, modifiedtm, weight
+        FROM live_pure_tag
+       <include refid="whereParam"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+
+    <sql id="whereParam">
+        <where>
+            <if test="id != null"> AND id = #{id}</if>
+            <if test="name != null"> AND name LIKE concat(#{name}, '%')</if>
+            <if test="status != null"> AND status = #{status}</if>
+            <if test="type != null"> AND type = #{type}</if>
+        </where>
+    </sql>
+    <select id="count" resultType="int">
+        SELECT count(id) FROM live_pure_tag
+        <include refid="whereParam"/>
+    </select>
+
+    <select id="getById" resultMap="tagMap">
+        SELECT id, `name`, `type`, pic, `desc`, status, createtm, modifiedtm, weight
+        from live_pure_tag where id=#{tagId}
+    </select>
+
+</mapper>

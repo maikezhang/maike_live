@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" >
+
+    <bean id="jedisPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig">
+        <property name="maxWaitMillis" value="-1"/>
+        <property name="maxTotal" value="8"/>
+        <property name="maxIdle" value="8"/>
+        <property name="blockWhenExhausted" value="true"/>
+    </bean>
+
+    <bean id="cachePool" class="redis.clients.jedis.JedisPool" depends-on="jedisPoolConfig" destroy-method="destroy">
+        <constructor-arg index="0" ref="jedisPoolConfig"/>
+        <constructor-arg index="1" value="${redis.host}"/>
+        <constructor-arg index="2" value="${redis.port}"/>
+        <constructor-arg index="3" value="${redis.timeout}"/>
+        <constructor-arg index="4" value="${redis.password}"/>
+        <constructor-arg index="5" value="${redis.database}"/>
+    </bean>
+    <bean id="pool" class="redis.clients.jedis.JedisPool" depends-on="jedisPoolConfig" destroy-method="destroy">
+        <constructor-arg index="0" ref="jedisPoolConfig"/>
+        <constructor-arg index="1" value="${redis.host}"/>
+        <constructor-arg index="2" value="${redis.port}"/>
+        <constructor-arg index="3" value="${redis.timeout}"/>
+        <constructor-arg index="4" value="${redis.password}"/>
+        <constructor-arg index="5" value="${redis.database}"/>
+    </bean>
+
+
+    <bean id="auctionCachePool" class="redis.clients.jedis.JedisPool" depends-on="jedisPoolConfig" destroy-method="destroy">
+        <constructor-arg index="0" ref="jedisPoolConfig"/>
+        <constructor-arg index="1" value="${auction.redis.host}"/>
+        <constructor-arg index="2" value="${auction.redis.port}"/>
+        <constructor-arg index="3" value="${auction.redis.timeout}"/>
+        <constructor-arg index="4" value="${auction.redis.password}"/>
+        <constructor-arg index="5" value="${auction.redis.database}"/>
+    </bean>
+
+    <bean id="redisCache" class="cn.idongjia.live.support.redis.RedisTools">
+        <constructor-arg name="jedisPool" ref="cachePool"/>
+    </bean>
+
+
+    <bean id="auctionRedisCache" class="cn.idongjia.live.support.redis.RedisTools">
+        <constructor-arg name="jedisPool" ref="auctionCachePool"/>
+    </bean>
+
+
+</beans>

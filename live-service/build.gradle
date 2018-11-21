@@ -1,0 +1,44 @@
+apply plugin: 'war'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+dependencies {
+
+    compile(project(':live-domain')) {
+        exclude module: 'zookeeper'
+        exclude module: 'common'
+        exclude module: 'com.sun.jersey'
+    }
+
+//    compile(rootProject.ext.dependencies['apm-brave']) {
+//        exclude module: 'common'
+//        exclude group: 'cn.idongjia'
+//    }
+
+    compile rootProject.ext.dependencies['jedis']
+    compile rootProject.ext.dependencies['gson']
+    compile rootProject.ext.dependencies['common']
+
+    // mysql
+    compile rootProject.ext.dependencies['mysql-connector']
+    compile rootProject.ext.dependencies['druid']
+    compile rootProject.ext.dependencies['mybatis']
+    compile rootProject.ext.dependencies['mybatis-spring']
+    compile rootProject.ext.dependencies['dozer']
+    compile(rootProject.ext.dependencies['zookeeper'])
+
+    //单元测试
+    testCompile rootProject.ext.dependencies['junit']
+    testCompile rootProject.ext.dependencies['spring-test']
+    testCompile rootProject.ext.dependencies['mockito-all']
+    testCompile rootProject.ext.dependencies['powerMock']
+    testCompile rootProject.ext.dependencies['powerMockCore']
+    testCompile rootProject.ext.dependencies['powerMockJunit']
+}
+
+war {
+    archiveName = "live.war"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.12'
+}

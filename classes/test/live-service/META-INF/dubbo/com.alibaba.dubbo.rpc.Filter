@@ -1,0 +1,8 @@
+echo=com.alibaba.dubbo.rpc.filter.EchoFilter
+clsLoader=com.alibaba.dubbo.rpc.filter.ClassLoaderFilter
+gnc=com.alibaba.dubbo.rpc.filter.GenericFilter
+context=com.alibaba.dubbo.rpc.filter.ContextFilter
+dubbo=cn.idongjia.live.restructure.exception.DubboAuthorizeExceptionFilter
+timeout=com.alibaba.dubbo.rpc.filter.TimeoutFilter
+monitor=com.alibaba.dubbo.monitor.support.MonitorFilter;
+trace=com.alibaba.dubbo.rpc.protocol.dubbo.filter.TraceFilter

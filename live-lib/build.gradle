@@ -1,0 +1,61 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
+
+dependencies {
+
+    compile rootProject.ext.dependencies['common']
+
+    compile(rootProject.ext.dependencies['zoo-lib']) {
+        exclude module: 'common'
+    }
+
+    compile rootProject.ext.dependencies['htmlparser']
+
+    //jedis
+    compile rootProject.ext.dependencies['jedis']
+
+    compile rootProject.ext.dependencies['protobuf']
+    compile rootProject.ext.dependencies['lombok']
+    compile rootProject.ext.dependencies['hibernate-validator']
+
+    //http 异步
+    compile rootProject.ext.dependencies['httpasyncclient']
+
+    testCompile rootProject.ext.dependencies['junit']
+    testCompile rootProject.ext.dependencies['spring-test']
+
+}
+version rootProject.ext.lib_version['live-lib']
+
+publishing {
+    if ("git log -n 1 --pretty=format:%h".execute().text.trim()
+            == 'git rev-parse --short HEAD'.execute().text.trim()) {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId "${project.name}"
+                from components.java
+                artifact sourceJar {
+                    classifier "sources"
+                }
+            }
+        }
+        repositories {
+            maven {
+                credentials {
+                    username "admin"
+                    password "admin123"
+                }
+                if (project.version.endsWith('-SNAPSHOT')) {
+                    url 'http://code.kaipao.cc:8082/nexus/content/repositories/snapshots/'
+                } else {//带git版本号的发布到snapshots中
+                    url 'http://code.kaipao.cc:8082/nexus/content/repositories/thirdparty/'
+                }
+            }
+        }
+    }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}

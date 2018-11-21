@@ -1,0 +1,13 @@
+DubboExceptionFilter=cn.idongjia.exception.filter.DubboExceptionFilter
+echo=com.alibaba.dubbo.rpc.filter.EchoFilter
+clsLoader=com.alibaba.dubbo.rpc.filter.ClassLoaderFilter
+gnc=com.alibaba.dubbo.rpc.filter.GenericFilter
+context=com.alibaba.dubbo.rpc.filter.ContextFilter
+dubbo=cn.idongjia.exception.filter.DubboExceptionFilter
+timeout=com.alibaba.dubbo.rpc.filter.TimeoutFilter
+monitor=com.alibaba.dubbo.monitor.cn.idongjia.outcry.support.MonitorFilter;
+trace=com.alibaba.dubbo.rpc.protocol.dubbo.filter.TraceFilter
+finalcontext=cn.idongjia.common.context.ProviderContextFilter
+consumerfilter=cn.idongjia.common.context.ConsumerContextFilter
+bravep=cn.idongjia.apm.brave.dubbo.DubboProviderFilter
+bravec=cn.idongjia.apm.brave.dubbo.DubboConsumerFilter

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://file.kaipao.cc/T3Ta_TBgWT1RCvBVdK.dtd">
+<configuration>
+	<properties>
+		<property name="dialect" value="mysql" />
+		<property name="pageSqlId" value=".*Page$" />
+	</properties>
+	<!-- <typeAliases>
+	   <typeAlias  alias="AdminUserDO" type="cn.dongjia.dubboAction.dal.mysql.object.AdminUserDO"/>
+	</typeAliases> -->
+	<plugins>
+		<plugin interceptor="cn.idongjia.live.cn.idongjia.live.support.PaginationInterceptor"></plugin>
+	</plugins>
+
+</configuration>

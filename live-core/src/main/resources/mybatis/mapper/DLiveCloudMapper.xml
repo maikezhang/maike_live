@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.DLiveCloudMapper">
+    <resultMap id="liveCloudMap" type="cn.idongjia.live.db.mybatis.po.DLiveCloudPO">
+        <id column="id" property="id" />
+        <result column="uid"        property="userId"          />
+        <result column="rtmp_url"   property="rtmpUrl"      />
+        <result column="hls_url"    property="hlsUrl"       />
+        <result column="flv_url"    property="flvUrl"       />
+        <result column="createtm"   property="createTime"   />
+        <result column="modifiedtm" property="modifiedTime" />
+    </resultMap>
+
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="dLiveCloudPO">
+        INSERT INTO live_cloud (uid, rtmp_url, hls_url, flv_url, createtm, modifiedtm) VALUES
+            (#{userId}, #{rtmpUrl}, #{hlsUrl}, #{flvUrl}, #{createTime}, #{modifiedTm})
+    </insert>
+
+    <update id="update">
+        UPDATE live_cloud
+        SET modifiedtm=#{newModifyDate}
+        <if test="userId    != null" >, uid      = #{userId}        </if>
+        <if test="rtmpUrl   != null" >, rtmp_url    = #{rtmpUrl}    </if>
+        <if test="hlsUrl    != null" >, hls_url     = #{hlsUrl}     </if>
+        <if test="flvUrl    != null" >, flv_url     = #{flvUrl}     </if>
+        <if test="createTime!= null" >, createtm    = #{createTime} </if>
+        <if test="modifiedTm!= null" >, modifiedtm  = #{modifiedTm} </if>
+        WHERE id = #{id}
+    </update>
+
+
+
+    <select id="getByUid" resultMap="liveCloudMap">
+        SELECT id, uid, rtmp_url, hls_url, flv_url, createtm, modifiedtm
+        FROM live_cloud lc WHERE userId = #{userId}
+    </select>
+
+    <select id="getById" resultMap="liveCloudMap">
+        SELECT id, uid, rtmp_url, hls_url, flv_url, createtm, modifiedtm
+        FROM live_cloud  WHERE id = #{id}
+    </select>
+</mapper>

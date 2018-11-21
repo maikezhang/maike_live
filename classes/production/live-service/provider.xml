@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task.xsd
+	    http://code.alibabatech.com/schema/dubbo
+	    http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	    http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <dubbo:application name="live" owner="dongjia" organization="dongjia"/>
+    <!--内网测试机-->
+    <dubbo:registry protocol="zookeeper" address="${zookeeper}" client="curator"/>
+
+    <dubbo:annotation/>
+
+    <dubbo:protocol name="rest" port="${server.port.rest}"
+                    contextpath="live" server="servlet"
+                    payload="16777216"/>
+
+    <dubbo:protocol name="dubbo" port="${server.port.dubbo}" payload="16777216"
+                    extension="cn.idongjia.exception.filter.DubboExceptionFilter"/>
+
+    <dubbo:provider
+            filter="-default,context,echo,clsLoader,gnc,dubbo,timeout,monitor,trace,bravep,finalcontext"/>
+    <dubbo:consumer filter="consumerfilter,bravec"/>
+
+    <dubbo:monitor protocol="registry"/>
+
+    <dubbo:service interface="cn.idongjia.live.service.impl.login.LoginService"
+                   ref="loginServiceImpl"
+                   validation="true"
+                   protocol="rest"/>
+    <!--新版接口 -->
+    <dubbo:service interface="cn.idongjia.live.api.live.LiveService"
+                   ref="liveServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.CraftsPureLiveService"
+                   ref="craftsPureLiveServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.HotAnchorsService"
+                   ref="hotAnchorsServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveAuditService"
+                   ref="pureLiveAuditServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveService"
+                   ref="pureLiveServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveTagService"
+                   ref="pureLiveTagServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveBookService"
+                   ref="pureLiveBookServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PureLiveBannerService"
+                   ref="pureLiveBannerService"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.WhiteListService"
+                   ref="whiteListServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.cloud.QCloudService"
+                   ref="qCloudServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.cloud.DCloudService"
+                   ref="dCloudServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.purelive.PlayBackService"
+                   ref="playBackServiceImpl"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.common.api.PingService"
+                   ref="ping"
+                   protocol="rest,dubbo"/>
+    <dubbo:service interface="cn.idongjia.live.api.live.VideoCoverService"
+                   ref="videoCoverService" protocol="dubbo, rest"/>
+    <dubbo:service interface="cn.idongjia.live.v2.service.CraftsLiveServiceV2"
+                   ref="craftsLiveServiceV2" protocol="dubbo,rest"/>
+
+    <dubbo:service interface="cn.idongjia.live.api.purelive.ResourceService"
+                   ref="resourceServiceImpl"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.live.ReportService"
+                   ref="reportServiceImpl"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.PageTabLiveServiceI"
+                   ref="pageTabLiveService"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.PageTabServiceI"
+                   ref="pageTabService"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.UserStageLiveServiceI"
+                   ref="userStageLiveService"
+                   protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.v2.service.LiveAnchorService"
+    ref="liveAnchorServiceImpl"  protocol="dubbo,rest"/>
+
+    <dubbo:service interface="cn.idongjia.live.api.homePage.LiveHomePageServiceI"
+                   ref="liveHomePageServiceI" protocol="dubbo,rest"/>
+
+    <dubbo:service interface="cn.idongjia.live.api.live.ModuleService" ref="moduleServiceImpl" protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.live.BannerService" ref="bannerServiceImpl" protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.live.LiveMPServiceI" ref="liveMPServiceImpl" protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.live.LiveLikeServiceI" ref="liveLikeServiceImpl" protocol="dubbo,rest"/>
+    <dubbo:service interface="cn.idongjia.live.api.live.AnchorBlackWhiteServiceI" ref="anchorBlackWhiteServiceImpl" protocol="dubbo,rest"/>
+
+</beans>

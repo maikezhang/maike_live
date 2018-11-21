@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.LiveResourceMapper">
+
+    <resultMap id="liveResourceMap" type="cn.idongjia.live.db.mybatis.po.LiveResourcePO">
+        <result column="id"         property="id"           />
+        <result column="res_id"     property="resourceId"   />
+        <result column="res_type"   property="resourceType" />
+        <result column="weight"     property="weight"       />
+        <result column="status"     property="status"       />
+        <result column="lid"     property="liveId"       />
+        <result column="createtm"   property="createTime"   />
+        <result column="modifiedtm" property="modifiedTime" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"
+            parameterType="cn.idongjia.live.pojo.purelive.PureLiveDetailDO">
+        INSERT INTO live_resource (res_id, res_type, weight, status, lid, createtm, modifiedtm)
+        VALUES (#{resourceId}, #{resourceType}, #{weight}, #{status}, #{liveId}, #{createTime}, #{modifiedTime})
+    </insert>
+
+    <update id="deleteResource">
+            UPDATE live_resource SET status=-1,modifiedtm=from_unixtime(#{newUpdateTime}/1000)
+            where lid=#{po.liveId} and res_id=#{po.resourceId} and res_type=#{po.resourceType}
+    </update>
+
+    <update id="updateWeight">
+         UPDATE live_resource SET weight = #{po.weight},modifiedtm=from_unixtime(#{newUpdateTime}/1000) where lid=#{po.liveId} and res_id=#{po.resourceId}
+    </update>
+
+    <update id="update">
+        UPDATE live_resource 
+        SET modifiedtm = from_unixtime(#{newUpdateTime}/1000)
+        <if test="resourceId != null"   >, res_id = #{resourceId}      </if>
+        <if test="resourceType != null" >, res_type = #{resourceType}  </if>
+        <if test="liveId != null"       >, lid = #{liveId}          </if>
+        <if test="weight != null"       >, weight = #{weight}          </if>
+        <if test="status != null"       >, status = #{status}          </if>
+        <if test="createTime != null"   >, createtm = #{createTime}    </if>
+        <if test="modifiedTime != null" >, modifiedtm = #{modifiedTime}</if>
+        WHERE id = #{id}
+    </update>
+
+    <select id="list" resultMap="liveResourceMap">
+        SELECT id, res_id, res_type, lid, weight, status, createtm, modifiedtm
+        FROM live_resource
+        <include refid="wherePara"/>
+        ORDER BY weight DESC
+        <if test="limit !=null">limit #{limit}</if>
+        <if test="offset !=null">offset #{offset}</if>
+
+    </select>
+
+    <sql id="wherePara">
+        <where>
+            <if test="id != null"> AND id = #{id}</if>
+            <if test="resourceId != null"> AND res_id = #{resourceId}</if>
+            <if test="weight != null"> AND weight = #{weight}</if>
+            <if test="status != null"> AND status = #{status}</if>
+            <if test="liveIds != null">AND lid in
+                <foreach collection="liveIds" item="liveId" separator="," open="(" close=")">
+                    #{liveId}
+                </foreach>
+            </if>
+            <if test="resourceType != null"> AND res_type = #{resourceType}</if>
+        </where>
+    </sql>
+    <insert id="batchInsert" useGeneratedKeys="true">
+        INSERT INTO live_resource (res_id, res_type, lid, weight, status, createtm, modifiedtm) VALUES
+            <foreach collection="liveResources" index="index" item="liveResource" separator=",">
+                (#{liveResource.resourceId}, #{liveResource.resourceType}, #{liveResource.liveId}, #{liveResource.weight}, #{liveResource.status},
+                from_unixtime(#{liveResource.createTime}/1000), from_unixtime(#{liveResource.modifiedTime}/1000))
+            </foreach>
+    </insert>
+    <select id="countGroup" resultType="cn.idongjia.live.db.mybatis.po.LiveResourceCountPO">
+       select count(1) count , lid liveId
+        from(
+        SELECT id, res_id, res_type, lid, weight, status, createtm, modifiedtm
+        FROM live_resource
+        <include refid="wherePara"/>
+        ) a group  by lid
+    </select>
+
+    <update id="deleteAllByLiveId">
+        UPDATE live_resource
+        SET modifiedtm = from_unixtime(#{newUpdateTime}/1000),status=-1 where lid=#{liveId} and res_type=1
+
+    </update>
+
+
+
+
+
+</mapper>

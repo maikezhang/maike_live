@@ -1,0 +1,46 @@
+import "ZooProto.proto";
+
+package cn.idongjia.live.proto;
+
+//服务类型
+enum LiveServiceType {
+
+    LIVE_URL_PUSH = 2000; //管理员开播,推送拉流地址
+    LIVE_STATE = 2001; //管理员开播、停播操作
+    LIVE_MAIN_RESOURCE = 2002; //直播主推资源
+}
+
+// LiveServiceType.LIVE_URL_PUSH 管理员开播,推送拉流地址
+message LiveUrlPush {
+    optional string flv_url = 1;
+    optional string rtmp_url = 2;
+    optional string hls_url = 3;
+}
+
+
+// LiveServiceType.LIVE_STATE 管理员开播/停播操作
+message LiveStateReq {
+    required int32 lsid = 1; //直播场id
+    required int32 type = 2; //1-开始;0-结束
+}
+
+message LiveStateRes {
+    required cn.idongjia.zoo.proto.ZooRes res = 1;
+}
+
+//主推
+message LiveMainResourcePush {
+    required fixed64 liveId=1;
+    required fixed64 itemId = 2;
+    required fixed32 type = 3;  // 1商品2拍品
+    required fixed64 price = 4;
+    optional string title = 5;
+    optional string pic = 6;
+    optional string username = 7;
+}
+//取消主推
+message LiveRemoveMainResourcePush{
+    required fixed64 liveId=1;
+    required fixed32 type = 2;  // 1商品2拍品
+    optional fixed64 itemId = 3;
+}

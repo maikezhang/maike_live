@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.VideoCoverMapper">
+    <resultMap id="liveVideoCoverMap" type="cn.idongjia.live.db.mybatis.po.VideoCoverPO">
+        <result property="id" column="id"/>
+        <result property="pic" column="pic"/>
+        <result property="duration" column="duration"/>
+        <result property="url" column="url"/>
+        <result property="liveId" column="live_id"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO live_video_cover(`duration`, `url`, `pic`,`live_id`, `create_time`, `update_time`)
+        VALUE (#{duration}, #{url}, #{pic}, #{liveId},#{createTime}, #{updateTime})
+    </insert>
+
+
+    <update id="update">
+        UPDATE live_video_cover
+        SET update_time=#{newUpdateTime}
+        <if test="po.duration!=null">, `duration` = #{po.duration}</if>
+        <if test="po.pic!=null">, `pic` = #{po.pic}</if>
+        <if test="po.url!=null">,url=#{po.url}</if>
+        <if test="po.liveId!=null">,`live_id`=#{po.liveId}</if>
+        WHERE id = #{po.id}
+    </update>
+    <select id="get" resultMap="liveVideoCoverMap">
+        SELECT id,`duration`, `url`, `pic`,`live_id`, `create_time`, `update_time`
+        FROM live_video_cover
+        WHERE id = #{0}
+    </select>
+    <select id="getByLiveId" resultMap="liveVideoCoverMap">
+        SELECT id,`duration`, `url`, `pic`,`live_id`, `create_time`, `update_time`
+        FROM live_video_cover
+        WHERE live_id = #{0}
+    </select>
+    <select id="list" resultMap="liveVideoCoverMap">
+        select id,`duration`, `url`, `pic`,`live_id`, `create_time`, `update_time`
+        from live_video_cover
+        where
+        live_id in
+        <foreach collection="liveIds" item="liveId" separator="," open="(" close=")">
+            #{liveId}
+        </foreach>
+    </select>
+
+
+    <update id="updateVideoCoverLiveId">
+        update live_video_cover  set live_id=#{po.liveId},update_time=#{newUpdateTime} where id=#{po.id}
+    </update>
+
+    <update id="delete">
+       DELETE FROM live_video_cover
+        WHERE live_id = #{liveId}
+    </update>
+
+</mapper>

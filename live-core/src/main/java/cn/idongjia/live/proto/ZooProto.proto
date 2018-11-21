@@ -1,0 +1,106 @@
+package cn.idongjia.zoo.proto;
+
+//服务类型
+enum ZooServiceType {
+
+    //app请求
+    SERVICE_HEARTBREAK = 1; //心跳
+    SERVICE_HISTORY = 2; //拉取历史
+    SERVICE_COMMENT = 3; //发言
+
+    //推送
+    SERVICE_MSG_PUSH = 4; //新增消息推送
+    SERVICE_COMMENT_INVALID_PUSH = 5; //评论无效推送
+
+    //管理员请求
+    SERVICE_COMMENT_INVALID = 6; //撤销评论
+
+    //补充
+    SERVICE_LOGIN_BY_OTHER_PUSH = 7; //登录弹出推送
+}
+
+//响应
+message ZooRes {
+    required fixed32 code = 1; //0-失败；1-成功
+    optional string info = 2;
+}
+
+//协议包
+message ZooPack {
+    required fixed32 service = 1; //服务类型
+    required bytes serialized = 2; //ModulePack 序列化字节
+    optional fixed64 time = 3; //请求时间或者推送时间
+}
+
+//消息结构
+message ZooMsg {
+    required fixed64 zmid = 1; // 消息id
+    //    optional fixed32 af = 2; // 0-普通用户,1-管理员,2-匠人,3-审核中的匠人 adminflag
+    optional fixed64 uid = 3; // 用户id
+    optional string username = 4; // 用户名
+    optional string avatar = 5; // 用户头像地址, 'T'开头的东家内部文件地址，或者http开头的网络文件地址
+    optional bytes content = 6; // 消息内容，如果为出价消息，content为价格
+    optional fixed32 state = 7; // 0-成功，1-失败:消息状态,（发言/出价)成功还是失败
+    optional fixed32 type = 8; // 参见zoo.properties
+    optional fixed64 time = 9; //返回消息的时间
+    optional string ext = 10; //扩展字段,json字符串
+    optional fixed32 userType = 11; //用户类型 0 普通用户 1 管理员 2 匠人 3 达人
+}
+
+//ZooServiceType.HEARTBREAK 心跳请求
+message ZooStatusReq {
+}
+
+message ZooStatusRes {
+    required ZooRes res = 1;
+    optional fixed32 count = 2; //	当前用户在线人数
+}
+
+// ZooServiceType.HISTORY			//拉取消息历史
+message ZooHistoryReq {
+    optional fixed64 zmid = 1; //已拉取顶部消息zmid
+}
+
+message ZooHistoryRes {
+    required ZooRes res = 1;
+    repeated ZooMsg msgs = 2;
+}
+
+// ZooServiceType.COMMENT
+message ZooCommentReq {
+    required bytes comment = 1; // 为bytes类型是因为有可能传emoji表情
+}
+
+message ZooCommentRes {
+    required ZooRes res = 1;
+    required fixed64 zmid = 2;
+}
+
+//// 服务端推送 ////
+
+// ZooServiceType.SERVICE_MSG_PUSH 新增消息推送
+message ZooMsgPush {
+    repeated ZooMsg msg = 1;
+}
+
+// WSServiceType.COMMENT_INVALID_PUSH 撤销评论推送
+message ZooCommentInvalidPush {
+    required fixed64 zmid = 1; //消息id
+    optional string info = 2; //评论无效原因
+}
+
+//// 管理后台请求 /////
+
+// ZooServiceType.COMMENT_INVALID 撤销评论
+message ZooCommentInvalidReq {
+    required fixed64 zmid = 1; //出价的zmid
+    optional string info = 2; //评论无效的说明
+}
+
+message ZooCommentInvalidRes {
+    required ZooRes res = 1;
+}
+
+//ZooServiceType.SERVICE_LOGIN_BY_OTHER_PUSH 被其它人登录，推送消息
+message LoginByOtherPush {
+}

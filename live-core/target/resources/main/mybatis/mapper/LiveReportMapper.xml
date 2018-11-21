@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.LiveReportMapper">
+    <resultMap id="liveReportMapper" type="cn.idongjia.live.db.mybatis.po.LiveReportPO">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="lid" column="target_id"/>
+        <result property="hostUid" column="host_uid"/>
+        <result property="hostName" column="host_name"/>
+        <result property="reportUid" column="report_uid"/>
+        <result property="reportName" column="report_name"/>
+        <result property="content" column="content"/>
+        <result property="type" column="report_type"/>
+        <result property="status" column="report_status"/>
+        <result property="desc" column="report_desc"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO kp_live_report(`title`, `target_id`, `host_uid`, `host_name`, `report_uid`,`report_name`,`content`,`report_type`,`report_status`,`report_desc`,`create_time`,`update_time`)
+        VALUE (#{title}, #{lid}, #{hostUid}, #{hostName}, #{reportUid},#{reportName},#{content},#{type},#{status},#{desc},#{createTime},#{updateTime})
+    </insert>
+
+    <update id="delete">
+        UPDATE kp_live_report
+        SET `status` = -1
+        WHERE id = #{lrid}
+    </update>
+
+    <select id="liveReports" resultMap="liveReportMapper">
+        SELECT *
+        FROM kp_live_report
+        <where>
+            <if test="userId !=null">AND host_uid=#{userId}</if>
+            <if test="reportUid !=null">AND report_uid=#{reportUid}</if>
+            <if test="liveId !=null">AND target_id=#{liveId}</if>
+            <if test="content !=null">AND `content` LIKE concat('%',concat(#{content},'%'))</if>
+            and report_status=0
+        </where>
+        <if test="orderBy != null"> ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+    <select id="countLiveReport" resultType="int">
+        SELECT count(*)
+        FROM kp_live_report
+        <where>
+            <if test="userId !=null">AND host_uid=#{userId}</if>
+            <if test="reportUid !=null">AND report_uid=#{reportUid}</if>
+            <if test="liveId !=null">AND target_id=#{liveId}</if>
+            <if test="content !=null">AND `content` LIKE concat('%',concat(#{content},'%'))</if>
+            and report_status=0
+        </where>
+    </select>
+</mapper>

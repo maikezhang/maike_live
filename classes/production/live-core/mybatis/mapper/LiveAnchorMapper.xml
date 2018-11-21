@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.idongjia.live.db.mybatis.mapper.LiveAnchorMapper">
+    <resultMap id="fieldColumn" type="cn.idongjia.live.db.mybatis.po.LiveAnchorPO">
+        <result property="id" column="id"/><!--  -->
+        <result property="userId" column="user_id"/><!-- 主播的用户id，用户表的uid -->
+        <result property="anchorState" column="anchor_state"/><!-- 当前主播状态；1=可以直播，2=禁播 -->
+        <result property="updateTime" column="update_time"/><!-- 更新时间，13位时间戳 -->
+        <result property="createTime" column="create_time"/><!-- 创建时间，13位时间戳 -->
+    </resultMap>
+
+    <sql id="fieldAsProperty">
+        `id`,
+        `user_id`,
+        `anchor_state`,
+        `update_time`,
+        `create_time`
+    </sql>
+
+    <sql id="fieldWithoutId">
+        `user_id`,
+        `anchor_state`,
+        `update_time`,
+        `create_time`
+    </sql>
+
+    <sql id="property">
+        #{id,jdbcType=BIGINT},
+        #{userId,jdbcType=BIGINT},
+        #{anchorState,jdbcType=INTEGER},
+        #{updateTime,jdbcType=BIGINT},
+        #{createTime,jdbcType=BIGINT}
+    </sql>
+
+    <sql id="propertyWithoutId">
+        #{userId,jdbcType=BIGINT},
+        #{anchorState,jdbcType=INTEGER},
+        #{updateTime,jdbcType=BIGINT},
+        #{createTime,jdbcType=BIGINT}
+    </sql>
+
+    <sql id="fieldEqProperty">
+        `id`=#{id,jdbcType=BIGINT},
+        `user_id`=#{userId,jdbcType=BIGINT},
+        `anchor_state`=#{anchorState,jdbcType=INTEGER},
+        `update_time`=#{updateTime,jdbcType=BIGINT},
+        `create_time`=#{createTime,jdbcType=BIGINT}
+    </sql>
+
+    <sql id="fieldEqPropertyIf">
+        <if test="id!=null">
+            `id`=#{id,jdbcType=BIGINT},
+        </if>
+        <if test="userId!=null">
+            `user_id`=#{userId,jdbcType=BIGINT},
+        </if>
+        <if test="anchorState!=null">
+            `anchor_state`=#{anchorState,jdbcType=INTEGER},
+        </if>
+        <if test="updateTime!=null">
+            `update_time`=#{updateTime,jdbcType=BIGINT},
+        </if>
+        <if test="createTime!=null">
+            `create_time`=#{createTime,jdbcType=BIGINT}
+        </if>
+    </sql>
+
+    <sql id="query">
+        <where>
+            <if test="id!=null">
+                AND `id`=#{id,jdbcType=BIGINT}
+            </if>
+            <if test="userId!=null">
+                AND `user_id`=#{userId,jdbcType=BIGINT}
+            </if>
+            <if test="anchorState!=null">
+                AND `anchor_state`=#{anchorState,jdbcType=INTEGER}
+            </if>
+            <if test="updateTime!=null">
+                AND `update_time`=#{updateTime,jdbcType=BIGINT}
+            </if>
+            <if test="createTime!=null">
+                AND `create_time`=#{createTime,jdbcType=BIGINT}
+            </if>
+            <if test="updateTimeFrom!=null">
+                AND `update_time`>=#{updateTimeFrom}
+            </if>
+            <if test="updateTimeEnd!=null">
+                AND `update_time`&lt;=#{updateTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="idQuery">
+        <where>
+            <if test="userId!=null">`user_id`=#{userId}</if>
+            <if test="userId==null">1=0</if>
+        </where>
+    </sql>
+
+    <insert id="insert" parameterType="liveAnchorPO"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `live_anchor` (<include refid="fieldWithoutId"/>) VALUES (<include refid="propertyWithoutId"/>)
+    </insert>
+
+    <update id="update" parameterType="liveAnchorPO">
+        UPDATE `live_anchor`
+        <set>
+            <include refid="fieldEqPropertyIf"/>
+        </set>
+        <include refid="idQuery"/>
+    </update>
+
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM `live_anchor`
+        <include refid="idQuery"/>
+    </delete>
+
+    <select id="getByUserId" resultMap="fieldColumn">
+        SELECT
+        <include refid="fieldAsProperty"/>
+        FROM `live_anchor`
+        <include refid="idQuery"/>
+    </select>
+
+    <select id="select" resultMap="fieldColumn" parameterType="cn.idongjia.live.v2.pojo.query.LiveAnchorQuery">
+        SELECT
+        <include refid="fieldAsProperty"/>
+        FROM `live_anchor`
+        <include refid="query"/>
+        <if test="orderBy != null">ORDER BY ${orderBy}</if>
+        <if test="limit != null">LIMIT ${limit}</if>
+        <if test="offset != null">OFFSET ${offset}</if>
+    </select>
+
+    <select id="count" resultType="java.lang.Integer" parameterType="cn.idongjia.live.v2.pojo.query.LiveAnchorQuery">
+        SELECT COUNT(1) FROM `live_anchor`
+        <include refid="query"/>
+    </select>
+</mapper>
